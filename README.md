@@ -2,8 +2,11 @@
 
 
 # Mekanism: Fury born in the Artifacts
-
+<img width="128" height="111" alt="iconbossyay" src="https://github.com/user-attachments/assets/d6dbface-07d3-401f-b3cd-314357f95357" />
+<br />
 **Mekanism: Fury born in the Artifacts** is a mod that adds new bosses for mekanism mod!
+
+
 
 # LICENSE
 This mod is under MIT license.
