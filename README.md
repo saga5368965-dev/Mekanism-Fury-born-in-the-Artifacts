@@ -3,4 +3,4 @@
 
 # LICENSE
 This mod is under MIT license.
-This mod uses assets from mekanism that is also under MIT license.
+This mod uses assets from [Mekanism](https://github.com/mekanism/Mekanism) that is also under MIT license.
