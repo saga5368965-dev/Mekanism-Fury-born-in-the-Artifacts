@@ -1,0 +1,74 @@
+package XiGyoku.furyborn.entity.AI;
+
+import XiGyoku.furyborn.entity.RobyteEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.sounds.SoundEvents;
+import java.util.EnumSet;
+
+public class RobyteAttackGoal extends Goal {
+    private final RobyteEntity mob;
+
+    public RobyteAttackGoal(RobyteEntity mob) {
+        this.mob = mob;
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+    }
+
+    @Override
+    public boolean canUse() {
+        return mob.getTarget() != null && mob.attackCooldown <= 0
+                && mob.getAttackTick() == 0 && mob.getCannonTick() == 0
+                && mob.phaseTransitionTick == 0
+                && !mob.hasEnteredFinalPhase();
+    }
+
+    @Override
+    public void start() {
+        if (mob.getRandom().nextBoolean()) {
+            mob.setAttackTick(1);
+        } else {
+            mob.setCannonTick(1);
+        }
+    }
+
+    @Override
+    public void tick() {
+        LivingEntity target = mob.getTarget();
+        if (target == null) return;
+
+        mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+
+        int aTick = mob.getAttackTick();
+        if (aTick > mob.START_DUR && aTick <= mob.START_DUR + mob.LOOP_DUR) {
+            mob.getNavigation().moveTo(target, 1.2D);
+            if (aTick % 5 == 0) {
+                mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
+                    if (entity != mob && entity.isAlive()) {
+                        float damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                        boolean hasHit = entity.hurt(mob.damageSources().mobAttack(mob), damage);
+                        if (hasHit) {
+                            mob.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.5F);
+                            double d0 = entity.getX() - mob.getX();
+                            double d2 = entity.getZ() - mob.getZ();
+                            entity.knockback(0.4D, d0, d2);
+                        }
+                    }
+                });
+            }
+        }
+
+        if (mob.getCannonTick() > 0 || (aTick > 0 && (aTick <= mob.START_DUR || aTick > mob.START_DUR + mob.LOOP_DUR))) {
+            mob.getNavigation().stop();
+        }
+    }
+
+    @Override
+    public boolean canContinueToUse() {
+        return (mob.getAttackTick() > 0 || mob.getCannonTick() > 0) && mob.phaseTransitionTick == 0;
+    }
+
+    @Override
+    public void stop() {
+    }
+}

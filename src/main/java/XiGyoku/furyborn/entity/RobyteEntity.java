@@ -1,6 +1,6 @@
 package XiGyoku.furyborn.entity;
 
-import XiGyoku.furyborn.entity.AI.SpinAttackGoal;
+import XiGyoku.furyborn.entity.AI.RobyteAttackGoal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -9,10 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -21,6 +18,7 @@ import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -36,6 +34,7 @@ import javax.annotation.Nullable;
 
 public class RobyteEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> ATTACK_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> CANNON_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> ENTERED_FINAL_PHASE = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.BOOLEAN);
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -48,6 +47,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public final int END_DUR = 20;
     public final int TOTAL_ATTACK_DUR = START_DUR + LOOP_DUR + END_DUR;
     public final int PHASE_TRANSITION_DUR = 60;
+    public final int CANNON_DUR = 280;
 
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -57,6 +57,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ATTACK_TICK, 0);
+        this.entityData.define(CANNON_TICK, 0);
         this.entityData.define(ENTERED_FINAL_PHASE, false);
     }
 
@@ -66,6 +67,14 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     public void setAttackTick(int tick) {
         this.entityData.set(ATTACK_TICK, tick);
+    }
+
+    public int getCannonTick() {
+        return this.entityData.get(CANNON_TICK);
+    }
+
+    public void setCannonTick(int tick) {
+        this.entityData.set(CANNON_TICK, tick);
     }
 
     public boolean hasEnteredFinalPhase() {
@@ -81,14 +90,15 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 .add(Attributes.MAX_HEALTH, 400.0)
                 .add(Attributes.ATTACK_DAMAGE, 4.0)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
-                .add(Attributes.MOVEMENT_SPEED, 0.25)
+                .add(Attributes.FOLLOW_RANGE, 48.0)
+                .add(Attributes.MOVEMENT_SPEED, 0.5)
                 .build();
     }
 
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new SpinAttackGoal(this));
+        this.goalSelector.addGoal(2, new RobyteAttackGoal(this));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
 
@@ -122,42 +132,29 @@ public class RobyteEntity extends Monster implements GeoEntity {
     }
 
     private <E extends RobyteEntity> PlayState predicate(AnimationState<E> state) {
-        if (this.tickCount < 40) return PlayState.STOP;
-        if (this.phaseTransitionTick > 0) return PlayState.STOP;
-        if (this.isDeadOrDying()) return PlayState.STOP;
+        if (this.tickCount < 40 || this.phaseTransitionTick > 0 || this.isDeadOrDying()) return PlayState.STOP;
+
+        if (this.getCannonTick() > 0) {
+            state.getController().setAnimation(RawAnimation.begin().thenLoop("CannonAttack"));
+            return PlayState.CONTINUE;
+        }
 
         int currentAttackTick = this.getAttackTick();
-
         if (currentAttackTick > 0) {
             if (currentAttackTick <= START_DUR) {
                 state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackStart"));
             } else if (currentAttackTick <= START_DUR + LOOP_DUR) {
-                if (state.isMoving()) {
-                    state.getController().setAnimation(RawAnimation.begin().thenLoop("RotationAttack"));
-                } else {
-                    state.getController().setAnimation(RawAnimation.begin().thenLoop("RotationAttackIdle"));
-                }
+                state.getController().setAnimation(RawAnimation.begin().thenLoop("RotationAttack"));
             } else {
                 state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackEnd"));
             }
             return PlayState.CONTINUE;
         }
-
         if (state.isMoving()) {
-            if (this.hasEnteredFinalPhase()) {
-                state.getController().setAnimation(RawAnimation.begin().thenLoop("FinalAttackWalking"));
-            } else {
-                state.getController().setAnimation(RawAnimation.begin().thenLoop("Walking"));
-            }
-            return PlayState.CONTINUE;
+            state.getController().setAnimation(RawAnimation.begin().thenLoop(this.hasEnteredFinalPhase() ? "FinalAttackWalking" : "Walking"));
+        } else {
+            state.getController().setAnimation(RawAnimation.begin().thenLoop(this.hasEnteredFinalPhase() ? "FinalAttackIdle" : "idle"));
         }
-
-        if (this.hasEnteredFinalPhase()) {
-            state.getController().setAnimation(RawAnimation.begin().thenLoop("FinalAttackIdle"));
-            return PlayState.CONTINUE;
-        }
-
-        state.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
         return PlayState.CONTINUE;
     }
 
@@ -190,22 +187,68 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public void tick() {
         super.tick();
 
-        if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
-            this.setEnteredFinalPhase(true);
-            this.phaseTransitionTick = 1;
-        }
+        if (!this.level().isClientSide()) {
+            if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
+                this.setEnteredFinalPhase(true);
+                this.phaseTransitionTick = 1;
+                this.setAttackTick(0);
+                this.setCannonTick(0);
+            }
 
-        if (this.phaseTransitionTick > 0) {
-            this.phaseTransitionTick++;
-            this.getNavigation().stop();
+            int cTick = this.getCannonTick();
+            if (cTick > 0) {
+                this.setCannonTick(cTick + 1);
+                this.getNavigation().stop();
+                if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
+                    shootWitherSkull();
+                }
+                if (cTick > CANNON_DUR) {
+                    this.setCannonTick(0);
+                    this.attackCooldown = 40;
+                }
+            }
 
-            if (this.phaseTransitionTick > PHASE_TRANSITION_DUR) {
-                this.phaseTransitionTick = 0;
+            int aTick = this.getAttackTick();
+            if (aTick > 0) {
+                this.setAttackTick(aTick + 1);
+                if (aTick > TOTAL_ATTACK_DUR) {
+                    this.setAttackTick(0);
+                    this.attackCooldown = 40;
+                }
+            }
+
+            if (this.phaseTransitionTick > 0) {
+                this.phaseTransitionTick++;
+                this.getNavigation().stop();
+                if (this.phaseTransitionTick > PHASE_TRANSITION_DUR) {
+                    this.phaseTransitionTick = 0;
+                }
+            }
+
+            if (this.attackCooldown > 0) {
+                this.attackCooldown--;
             }
         }
+    }
 
-        if (this.attackCooldown > 0) {
-            this.attackCooldown--;
+    private void shootWitherSkull() {
+        LivingEntity target = this.getTarget();
+        if (target != null) {
+            double d0 = target.getX() - this.getX();
+            double d1 = target.getY(0.5D) - this.getY(1.0D);
+            double d2 = target.getZ() - this.getZ();
+
+            net.minecraft.world.phys.Vec3 look = this.getViewVector(1.0F);
+
+            double spawnX = this.getX() + look.x * 1.0D;
+            double spawnY = this.getY(1.5D) - 2.0D;
+            double spawnZ = this.getZ() + look.z * 1.0D;
+
+            WitherSkull skull = new WitherSkull(this.level(), this, d0, d1, d2);
+            skull.setPos(spawnX, spawnY, spawnZ);
+
+            this.level().addFreshEntity(skull);
+            this.playSound(SoundEvents.WITHER_SHOOT, 1.0F, 1.0F);
         }
     }
 
