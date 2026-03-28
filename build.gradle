@@ -141,8 +141,13 @@ repositories {
     // }
     maven {
         name = 'GeckoLib'
-        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+        }
     }
+
 }
 
 dependencies {
@@ -170,7 +175,7 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
-
+    implementation("com.eliotlash.mclib:mclib:20")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
