@@ -40,7 +40,7 @@ public class RobyteAttackGoal extends Goal {
         mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
         int aTick = mob.getAttackTick();
-        if (aTick > mob.START_DUR && aTick <= mob.START_DUR + mob.LOOP_DUR) {
+        if (aTick > mob.ROTATION_START_DUR && aTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
             mob.getNavigation().moveTo(target, 1.2D);
             if (aTick % 5 == 0) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
@@ -58,7 +58,7 @@ public class RobyteAttackGoal extends Goal {
             }
         }
 
-        if (mob.getCannonTick() > 0 || (aTick > 0 && (aTick <= mob.START_DUR || aTick > mob.START_DUR + mob.LOOP_DUR))) {
+        if (mob.getCannonTick() > 0 || (aTick > 0 && (aTick <= mob.ROTATION_START_DUR || aTick > mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR))) {
             mob.getNavigation().stop();
         }
     }

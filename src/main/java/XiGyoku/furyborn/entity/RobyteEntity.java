@@ -42,10 +42,10 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public int attackCooldown = 0;
     public int phaseTransitionTick = 0;
 
-    public final int START_DUR = 20;
-    public final int LOOP_DUR = 200;
-    public final int END_DUR = 20;
-    public final int TOTAL_ATTACK_DUR = START_DUR + LOOP_DUR + END_DUR;
+    public final int ROTATION_START_DUR = 20;
+    public final int ROTATION_LOOP_DUR = 200;
+    public final int ROTATION_END_DUR = 20;
+    public final int ROTATION_TOTAL_ATTACK_DUR = ROTATION_START_DUR + ROTATION_LOOP_DUR + ROTATION_END_DUR;
     public final int PHASE_TRANSITION_DUR = 60;
     public final int CANNON_DUR = 280;
 
@@ -141,9 +141,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
         int currentAttackTick = this.getAttackTick();
         if (currentAttackTick > 0) {
-            if (currentAttackTick <= START_DUR) {
+            if (currentAttackTick <= ROTATION_START_DUR) {
                 state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackStart"));
-            } else if (currentAttackTick <= START_DUR + LOOP_DUR) {
+            } else if (currentAttackTick <= ROTATION_START_DUR + ROTATION_LOOP_DUR) {
                 state.getController().setAnimation(RawAnimation.begin().thenLoop("RotationAttack"));
             } else {
                 state.getController().setAnimation(RawAnimation.begin().thenPlayAndHold("RotationAttackEnd"));
@@ -211,7 +211,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             int aTick = this.getAttackTick();
             if (aTick > 0) {
                 this.setAttackTick(aTick + 1);
-                if (aTick > TOTAL_ATTACK_DUR) {
+                if (aTick > ROTATION_TOTAL_ATTACK_DUR) {
                     this.setAttackTick(0);
                     this.attackCooldown = 40;
                 }
