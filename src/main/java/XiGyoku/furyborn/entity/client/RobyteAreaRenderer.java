@@ -1,0 +1,63 @@
+package XiGyoku.furyborn.entity.client;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import org.joml.Matrix4f;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class RobyteAreaRenderer extends EntityRenderer<RobyteAreaEntity> {
+    private final List<ResourceLocation> frames = new ArrayList<>();
+
+    public RobyteAreaRenderer(EntityRendererProvider.Context pContext) {
+        super(pContext);
+        for (int i = 1; i <= 21; i++) {
+            frames.add(ResourceLocation.fromNamespaceAndPath("furyborn", "textures/effect/operation/operation_effect_" + i + ".png"));
+        }
+    }
+
+    @Override
+    public void render(RobyteAreaEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack poseStack, MultiBufferSource pBuffer, int pPackedLight) {
+        if (!pEntity.isAlive()) return;
+        long gameTime = pEntity.level().getGameTime();
+        int currentFrame = (int) ((gameTime / 2) % 21);
+        VertexConsumer consumer = pBuffer.getBuffer(RenderType.entityTranslucent(frames.get(currentFrame)));
+        int enlightment = LightTexture.FULL_BRIGHT;
+        float radius = 32.0f;
+        float height = 20.0f;
+        float tileSize = 4.0f;
+        for (int i = 0; i < 4; i++) {
+            poseStack.pushPose();
+            poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(i * 90.0F));
+            poseStack.translate(0, 0, radius);
+            Matrix4f matrix = poseStack.last().pose();
+            for (float x = -radius; x < radius; x += tileSize) {
+                for (float y = 0; y < height; y += tileSize) {
+                    float x1 = x;
+                    float x2 = x + tileSize;
+                    float y1 = y;
+                    float y2 = y + tileSize;
+                    consumer.vertex(matrix, x1, y1, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 0, 1).endVertex();
+                    consumer.vertex(matrix, x1, y2, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 0, 1).endVertex();
+                    consumer.vertex(matrix, x2, y2, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 0, 1).endVertex();
+                    consumer.vertex(matrix, x2, y1, 0).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 0, 1).endVertex();
+                }
+            }
+            poseStack.popPose();
+        }
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(RobyteAreaEntity robyteAreaEntity) {
+        return new ResourceLocation("minecraft", "textures/particle/white_heart.png");
+    }
+}

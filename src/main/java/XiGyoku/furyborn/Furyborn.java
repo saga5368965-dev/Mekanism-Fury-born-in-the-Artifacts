@@ -2,10 +2,12 @@ package XiGyoku.furyborn;
 
 import XiGyoku.furyborn.block.FuryBornBlocks;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
+import XiGyoku.furyborn.entity.client.RobyteAreaRenderer;
 import XiGyoku.furyborn.entity.client.RobyteRenderer;
 import XiGyoku.furyborn.item.FuryBornItems;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.food.FoodProperties;
@@ -117,6 +119,7 @@ public class Furyborn {
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE.get(), RobyteRenderer::new);
+            EntityRenderers.register(FuryBornEntityTypes.ROBYTE_AREA.get(), RobyteAreaRenderer::new);
         }
     }
 }

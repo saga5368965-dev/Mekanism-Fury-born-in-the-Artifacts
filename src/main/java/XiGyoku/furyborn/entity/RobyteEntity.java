@@ -1,6 +1,7 @@
 package XiGyoku.furyborn.entity;
 
 import XiGyoku.furyborn.entity.AI.RobyteAttackGoal;
+import XiGyoku.furyborn.entity.client.RobyteAreaEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -188,6 +189,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
         super.tick();
 
         if (!this.level().isClientSide()) {
+            if (this.tickCount == 1) {
+                RobyteAreaEntity areaEntity = new RobyteAreaEntity(FuryBornEntityTypes.ROBYTE_AREA.get(), this.level());
+                areaEntity.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+                this.level().addFreshEntity(areaEntity);
+            }
             if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {
                 this.setEnteredFinalPhase(true);
                 this.phaseTransitionTick = 1;
@@ -257,12 +263,12 @@ public class RobyteEntity extends Monster implements GeoEntity {
         ++this.deathTime;
 
         if (this.hasEnteredFinalPhase()) {
-            if (this.deathTime == 140 && !this.level().isClientSide()) {
+            if (this.deathTime >= 140 && !this.level().isClientSide()) {
                 this.level().broadcastEntityEvent(this, (byte)60);
                 this.remove(Entity.RemovalReason.KILLED);
             }
         } else {
-            if (this.deathTime == 1 && !this.level().isClientSide()) {
+            if (this.deathTime >= 1 && !this.level().isClientSide()) {
                 this.level().broadcastEntityEvent(this, (byte)60);
                 this.remove(Entity.RemovalReason.KILLED);
             }
