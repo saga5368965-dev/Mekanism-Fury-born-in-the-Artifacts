@@ -110,7 +110,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.FOLLOW_RANGE, 128.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.5)
-                .add(Attributes.FLYING_SPEED, 1.2)
+                .add(Attributes.FLYING_SPEED, 1.5)
                 .build();
     }
 
