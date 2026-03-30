@@ -53,38 +53,38 @@ public class RobyteAreaRenderer extends EntityRenderer<RobyteAreaEntity> {
                 }
             }
             poseStack.popPose();
-            poseStack.pushPose();
-            Matrix4f matrixTop = poseStack.last().pose();
-            for (float x = -radius; x < radius; x += tileSize) {
-                for (float z = -radius; z < radius; z += tileSize) {
-                    float x1 = x;
-                    float x2 = x + tileSize;
-                    float z1 = z;
-                    float z2 = z + tileSize;
-                    consumer.vertex(matrixTop, x1, height, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
-                    consumer.vertex(matrixTop, x1, height, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
-                    consumer.vertex(matrixTop, x2, height, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
-                    consumer.vertex(matrixTop, x2, height, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
-                }
-            }
-            poseStack.popPose();
-
-            poseStack.pushPose();
-            Matrix4f matrixBottom = poseStack.last().pose();
-            for (float x = -radius; x < radius; x += tileSize) {
-                for (float z = -radius; z < radius; z += tileSize) {
-                    float x1 = x;
-                    float x2 = x + tileSize;
-                    float z1 = z;
-                    float z2 = z + tileSize;
-                    consumer.vertex(matrixBottom, x1, 0, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
-                    consumer.vertex(matrixBottom, x1, 0, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
-                    consumer.vertex(matrixBottom, x2, 0, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
-                    consumer.vertex(matrixBottom, x2, 0, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
-                }
-            }
-            poseStack.popPose();
         }
+        poseStack.pushPose();
+        Matrix4f matrixTop = poseStack.last().pose();
+        for (float x = -radius; x < radius; x += tileSize) {
+            for (float z = -radius; z < radius; z += tileSize) {
+                float x1 = x;
+                float x2 = x + tileSize;
+                float z1 = z;
+                float z2 = z + tileSize;
+                consumer.vertex(matrixTop, x1, height, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
+                consumer.vertex(matrixTop, x1, height, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
+                consumer.vertex(matrixTop, x2, height, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
+                consumer.vertex(matrixTop, x2, height, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, 1, 0).endVertex();
+            }
+        }
+        poseStack.popPose();
+
+        poseStack.pushPose();
+        Matrix4f matrixBottom = poseStack.last().pose();
+        for (float x = -radius; x < radius; x += tileSize) {
+            for (float z = -radius; z < radius; z += tileSize) {
+                float x1 = x;
+                float x2 = x + tileSize;
+                float z1 = z;
+                float z2 = z + tileSize;
+                consumer.vertex(matrixBottom, x1, 0, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
+                consumer.vertex(matrixBottom, x1, 0, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(0, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
+                consumer.vertex(matrixBottom, x2, 0, z2).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
+                consumer.vertex(matrixBottom, x2, 0, z1).color(1.0f, 1.0f, 1.0f, 1.0f).uv(1, 1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(enlightment).normal(0, -1, 0).endVertex();
+            }
+        }
+        poseStack.popPose();
     }
 
 

@@ -2,12 +2,15 @@ package XiGyoku.furyborn.entity.client;
 
 import XiGyoku.furyborn.entity.RobyteEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
+import java.util.UUID;
+
 public class RobyteAreaEntity extends Entity {
-    private RobyteEntity robyte = null;
+    private UUID bossId = null;
 
     public RobyteAreaEntity(EntityType<?> pEntityType, Level pLevel)
     {
@@ -16,17 +19,19 @@ public class RobyteAreaEntity extends Entity {
     }
 
     public void setRobyte(RobyteEntity robyte) {
-        this.robyte = robyte;
+        this.bossId = robyte.getUUID();
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (!this.level().isClientSide()) {
-
-            if (this.robyte != null) {
-                if (this.robyte.isRemoved() || !this.robyte.isAlive()) {
-                    this.discard();
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+            if (this.bossId != null) {
+                Entity boss = serverLevel.getEntity(this.bossId);
+                if (boss != null) {
+                    if (boss.isRemoved() || !boss.isAlive()) {
+                        this.discard();
+                    }
                 }
             } else {
                 if (this.tickCount > 10) {
@@ -48,11 +53,15 @@ public class RobyteAreaEntity extends Entity {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compoundTag) {
-
+        if (compoundTag.hasUUID("BossId")) {
+            this.bossId = compoundTag.getUUID("BossId");
+        }
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compoundTag) {
-
+        if (this.bossId != null) {
+            compoundTag.putUUID("BossId", this.bossId);
+        }
     }
 }

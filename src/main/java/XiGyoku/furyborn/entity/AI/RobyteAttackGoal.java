@@ -49,7 +49,7 @@ public class RobyteAttackGoal extends Goal {
             mob.setYRot(targetYaw);
             mob.yHeadRot = targetYaw;
             mob.yBodyRot = targetYaw;
-            net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.2D);
+            net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.3D);
             mob.setDeltaMovement(dashVec);
 
             if (aTick % 5 == 0) {
