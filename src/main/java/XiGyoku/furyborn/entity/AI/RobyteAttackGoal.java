@@ -41,7 +41,12 @@ public class RobyteAttackGoal extends Goal {
 
         int aTick = mob.getAttackTick();
         if (aTick > mob.ROTATION_START_DUR && aTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
-            mob.getNavigation().moveTo(target, 2.4D);
+            double dx = target.getX() - mob.getX();
+            double dy = (target.getY() + target.getEyeHeight() / 2.0D) - mob.getY();
+            double dz = target.getZ() - mob.getZ();
+            net.minecraft.world.phys.Vec3 dashVec = new net.minecraft.world.phys.Vec3(dx, dy, dz).normalize().scale(0.1D);
+            mob.setDeltaMovement(dashVec);
+
             if (aTick % 5 == 0) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
                     if (entity != mob && entity.isAlive()) {
@@ -60,6 +65,8 @@ public class RobyteAttackGoal extends Goal {
 
         if (mob.getCannonTick() > 0 || (aTick > 0 && (aTick <= mob.ROTATION_START_DUR || aTick > mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR))) {
             mob.getNavigation().stop();
+            mob.setDeltaMovement(0, 0, 0);
+            mob.getMoveControl().setWantedPosition(mob.getX(), mob.getY(), mob.getZ(), 0.0D);
         }
     }
 
