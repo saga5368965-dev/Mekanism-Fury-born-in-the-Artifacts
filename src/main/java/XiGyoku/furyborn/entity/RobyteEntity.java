@@ -91,7 +91,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 .add(Attributes.MAX_HEALTH, 400.0)
                 .add(Attributes.ATTACK_DAMAGE, 4.0)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
-                .add(Attributes.FOLLOW_RANGE, 48.0)
+                .add(Attributes.FOLLOW_RANGE, 128.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.5)
                 .build();
     }
@@ -191,7 +191,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
         if (!this.level().isClientSide()) {
             if (this.tickCount == 1) {
                 RobyteAreaEntity areaEntity = new RobyteAreaEntity(FuryBornEntityTypes.ROBYTE_AREA.get(), this.level());
-                areaEntity.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+                areaEntity.moveTo(this.getX(), this.getY() - 2.0f, this.getZ(), this.getYRot(), this.getXRot());
+                areaEntity.setRobyte(this);
                 this.level().addFreshEntity(areaEntity);
             }
             if (!this.isDeadOrDying() && !this.hasEnteredFinalPhase() && this.getHealth() <= this.getMaxHealth() * 0.2F) {

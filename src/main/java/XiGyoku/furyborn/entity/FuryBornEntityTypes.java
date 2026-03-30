@@ -24,6 +24,7 @@ public class FuryBornEntityTypes {
             ENTITY_TYPES.register("robyte_area",
                     () -> EntityType.Builder.of(RobyteAreaEntity::new, MobCategory.MISC)
                             .sized(0.8f,3.0f)
+                            .clientTrackingRange(10)
                             .build(new ResourceLocation(Furyborn.MODID, "robyte_area").toString()));
 
     public static void register(IEventBus eventBus) {
