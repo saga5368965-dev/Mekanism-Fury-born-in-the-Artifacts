@@ -1,0 +1,32 @@
+{
+  "t_supercomputer_loading": {
+    "category": "block",
+    "subtitle": "furyborn.subtitle.supercomputer_loading",
+    "sounds": [
+      "furyborn:t_supercomputer_loading"
+    ]
+  },
+  "robyte_bgm": {
+    "category": "music",
+    "sounds": [
+      {
+        "name": "furyborn:robyte_bgm",
+        "stream": true
+      }
+    ]
+  },
+  "robyte_teleport": {
+    "category": "hostile",
+    "subtitle": "furyborn.subtitle.robyte_teleport",
+    "sounds": [
+      "furyborn:robyte_teleport"
+    ]
+  },
+  "robyte_getup": {
+    "category": "hostile",
+    "subtitle": "furyborn.subtitle.robyte_getup",
+    "sounds": [
+      "furyborn:robyte_getup"
+    ]
+  },
+}

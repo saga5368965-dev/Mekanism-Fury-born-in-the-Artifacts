@@ -2,10 +2,13 @@ package XiGyoku.furyborn.block;
 
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import XiGyoku.furyborn.item.FuryBornItems;
+import XiGyoku.furyborn.sound.FuryBornSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -56,17 +59,26 @@ public class SuperComputerBlock extends Block {
                     heldItem.shrink(1);
                 }
 
-                Entity robyteEntity = FuryBornEntityTypes.ROBYTE.get().create(level);
+                level.playSound(null, pos, FuryBornSounds.SUPERCOMPUTER_LOADING.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
 
-                if (robyteEntity != null) {
-                    robyteEntity.moveTo(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
-                    level.addFreshEntity(robyteEntity);
-                    level.playSound(null, pos, SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                }
+                level.scheduleTick(pos, this, 100);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return super.use(state, level, pos, player, hand, hit);
+    }
+
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        super.tick(state, level, pos, random);
+
+        Entity robyteEntity = FuryBornEntityTypes.ROBYTE.get().create(level);
+
+        if (robyteEntity != null) {
+            robyteEntity.moveTo(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
+            level.addFreshEntity(robyteEntity);
+            level.playSound(null, pos, FuryBornSounds.ROBYTE_GETUP.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
     }
 }

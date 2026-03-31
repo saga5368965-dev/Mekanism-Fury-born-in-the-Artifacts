@@ -3,6 +3,7 @@ package XiGyoku.furyborn.entity;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.AI.RobyteAttackGoal;
 import XiGyoku.furyborn.entity.client.RobyteAreaEntity;
+import XiGyoku.furyborn.sound.FuryBornSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -61,6 +62,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public final int CANNON_DUR = 280;
 
     private boolean hasSummonedArea = false;
+    public int teleportCooldown = 0;
+    public int bgmTick = 0;
+    public final int BGM_LENGTH_TICKS = 400;
 
     public RobyteEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -213,12 +217,43 @@ public class RobyteEntity extends Monster implements GeoEntity {
         super.tick();
 
         if (!this.level().isClientSide()) {
+            if (this.bgmTick <= 0) {
+                this.playSound(FuryBornSounds.ROBYTE_BGM.get(), 5.0F, 1.0F);
+                this.bgmTick = BGM_LENGTH_TICKS;
+            } else {
+                this.bgmTick--;
+            }
             if (!this.hasSummonedArea) {
                 RobyteAreaEntity areaEntity = new RobyteAreaEntity(FuryBornEntityTypes.ROBYTE_AREA.get(), this.level());
                 areaEntity.moveTo(this.getX(), this.getY() - 2.0f, this.getZ(), this.getYRot(), this.getXRot());
                 areaEntity.setRobyte(this);
                 this.level().addFreshEntity(areaEntity);
                 this.hasSummonedArea = true;
+            }
+            if (this.teleportCooldown > 0) {
+                this.teleportCooldown--;
+            }
+
+            LivingEntity target = this.getTarget();
+            if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
+                if (this.distanceToSqr(player) > 32.0 * 32.0) {
+                    float yRot = player.getYRot();
+
+                    double offsetX = Math.sin(Math.toRadians(yRot)) * 6.0;
+                    double offsetZ = -Math.cos(Math.toRadians(yRot)) * 6.0;
+
+                    double targetX = player.getX() + offsetX;
+                    double targetY = player.getY() + 1.0;
+                    double targetZ = player.getZ() + offsetZ;
+
+                    this.teleportTo(targetX, targetY, targetZ);
+                    this.lookAt(player, 30.0F, 30.0F);
+                    this.setYRot(player.getYRot());
+
+                    this.playSound(FuryBornSounds.ROBYTE_TELEPORT.get(), 1.0F, 1.0F);
+
+                    this.teleportCooldown = 400;
+                }
             }
             if (!this.isDeadOrDying()) {
                 RobyteAreaEntity myArea = null;
