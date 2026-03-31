@@ -1,0 +1,39 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:robyte_datamodel"
+    },
+    "title": {
+      "text": "ロビ虐・真"
+    },
+    "description": {
+      "text": "暴走したロビットを倒す。"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "furyborn:root",
+  "criteria": {
+    "killed_boss": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "furyborn:robyte"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "killed_boss"
+    ]
+  ]
+}
