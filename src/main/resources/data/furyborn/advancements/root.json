@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "item": "furyborn:robit_datamodel"
+    },
+    "title": {
+      "text": "Fury Born"
+    },
+    "description": {
+      "text": "ロビットのデータモデルを手に入れた。一体何に使えるんだろう...?"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_datamodel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "furyborn:robit_datamodel"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
