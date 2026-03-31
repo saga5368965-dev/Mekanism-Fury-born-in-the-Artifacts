@@ -230,7 +230,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.level().addFreshEntity(areaEntity);
                 this.hasSummonedArea = true;
                 this.cachedArea = areaEntity;
-            }else if(this.cachedArea == null) {
+            } else if (this.cachedArea == null) {
                 for (RobyteAreaEntity area : this.level().getEntitiesOfClass(RobyteAreaEntity.class, this.getBoundingBox().inflate(128.0D))) {
                     if (this.getUUID().equals(area.getRobyteId())) {
                         this.cachedArea = area;
@@ -238,10 +238,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     }
                 }
             }
+
+            if (this.tickCount >= 40) {
             if (this.teleportCooldown > 0) {
                 this.teleportCooldown--;
             }
-
             LivingEntity target = this.getTarget();
             if (target instanceof Player player && this.teleportCooldown <= 0 && !this.isDeadOrDying()) {
                 if (this.cachedArea.isEntityInsideArea(this) && this.cachedArea.isEntityInsideArea(player)) {
@@ -326,6 +327,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
             if (this.attackCooldown > 0) {
                 this.attackCooldown--;
             }
+        }
         }
     }
 
