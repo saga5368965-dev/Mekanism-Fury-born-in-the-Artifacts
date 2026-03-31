@@ -1,7 +1,7 @@
 package XiGyoku.furyborn.client.gui;
 
 import XiGyoku.furyborn.effect.FuryBornEffects;
-import XiGyoku.furyborn.entity.client.RobyteAreaEntity;
+import XiGyoku.furyborn.entity.RobyteAreaEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

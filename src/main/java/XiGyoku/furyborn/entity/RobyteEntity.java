@@ -3,17 +3,18 @@ package XiGyoku.furyborn.entity;
 import XiGyoku.furyborn.client.sound.ClientSoundHelper;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.AI.RobyteAttackGoal;
-import XiGyoku.furyborn.entity.client.RobyteAreaEntity;
 import XiGyoku.furyborn.sound.FuryBornSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomFlyingGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -31,7 +31,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.WitherSkull;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -42,13 +41,13 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class RobyteEntity extends Monster implements GeoEntity {
     private static final EntityDataAccessor<Integer> ATTACK_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CANNON_TICK = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> ENTERED_FINAL_PHASE = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.BOOLEAN);
+    private final ServerBossEvent bossEvent = new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -215,8 +214,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
-
         if (this.level().isClientSide() && !this.isDeadOrDying()) {
+            this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
             if (!this.hasStartedClientBgm) {
                 ClientSoundHelper.playRobyteBgm(this);
                 this.hasStartedClientBgm = true;
@@ -285,6 +284,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.phaseTransitionTick = 1;
                 this.setAttackTick(0);
                 this.setCannonTick(0);
+                this.bossEvent.setColor(BossEvent.BossBarColor.GREEN);
+                this.bossEvent.setOverlay(BossEvent.BossBarOverlay.NOTCHED_6);
             }
             if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
                 if (this.tickCount % 15 == 0) {
@@ -441,6 +442,18 @@ public class RobyteEntity extends Monster implements GeoEntity {
             }
         }
         return hurt;
+    }
+
+    @Override
+    public void startSeenByPlayer(ServerPlayer pPlayer) {
+        super.startSeenByPlayer(pPlayer);
+        this.bossEvent.addPlayer(pPlayer);
+    }
+
+    @Override
+    public void stopSeenByPlayer(ServerPlayer pPlayer) {
+        super.stopSeenByPlayer(pPlayer);
+        this.bossEvent.removePlayer(pPlayer);
     }
 
     @Override

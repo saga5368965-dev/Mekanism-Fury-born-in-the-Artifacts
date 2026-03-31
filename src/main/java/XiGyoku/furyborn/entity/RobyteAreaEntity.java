@@ -1,7 +1,6 @@
-package XiGyoku.furyborn.entity.client;
+package XiGyoku.furyborn.entity;
 
 import XiGyoku.furyborn.effect.FuryBornEffects;
-import XiGyoku.furyborn.entity.RobyteEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
