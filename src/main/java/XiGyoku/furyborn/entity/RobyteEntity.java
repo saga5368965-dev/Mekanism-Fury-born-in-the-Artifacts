@@ -215,13 +215,13 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public void tick() {
         super.tick();
         if (this.level().isClientSide() && !this.isDeadOrDying()) {
-            this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
             if (!this.hasStartedClientBgm) {
                 ClientSoundHelper.playRobyteBgm(this);
                 this.hasStartedClientBgm = true;
             }
         }
         if (!this.level().isClientSide()) {
+            this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
             if (!this.hasSummonedArea) {
                 RobyteAreaEntity areaEntity = new RobyteAreaEntity(FuryBornEntityTypes.ROBYTE_AREA.get(), this.level());
                 areaEntity.moveTo(this.getX(), this.getY() - 2.0f, this.getZ(), this.getYRot(), this.getXRot());
