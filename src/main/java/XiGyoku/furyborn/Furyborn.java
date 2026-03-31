@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -55,7 +56,7 @@ public class Furyborn {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
     // Creates a creative tab with the id "furyborn:furyborn_tab" for the example item, that is placed after the combat tab
-    public static final RegistryObject<CreativeModeTab> FURYBORN_TAB = CREATIVE_MODE_TABS.register("furyborn_tab", () -> CreativeModeTab.builder().icon(() -> FuryBornItems.ROBYTE_DATA_MODEL.get().getDefaultInstance()).displayItems((parameters, output) -> {
+    public static final RegistryObject<CreativeModeTab> FURYBORN_TAB = CREATIVE_MODE_TABS.register("furyborn_tab", () -> CreativeModeTab.builder().icon(() -> FuryBornItems.ROBYTE_DATA_MODEL.get().getDefaultInstance()).title(Component.translatable("itemGroup.furyborn_tab")).displayItems((parameters, output) -> {
         output.accept(FuryBornItems.T_SUPER_BLOCK_ITEM.get());
         output.accept(FuryBornItems.ROBYTE_DATA_MODEL.get());
         output.accept(FuryBornItems.ROBIT_DATA_MODEL.get());
