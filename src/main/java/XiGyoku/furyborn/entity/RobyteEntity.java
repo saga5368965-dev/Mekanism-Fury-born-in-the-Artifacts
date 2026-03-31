@@ -297,7 +297,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.setCannonTick(cTick + 1);
                 this.getNavigation().stop();
                 if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
-                    shootWitherSkull();
+                    if(!this.hasEnteredFinalPhase()) {
+                        shootWitherSkull();
+                    }else {
+                        shootThreeWitherSkull();
+                    }
                 }
                 if (cTick > CANNON_DUR) {
                     this.setCannonTick(0);
@@ -329,6 +333,35 @@ public class RobyteEntity extends Monster implements GeoEntity {
     }
 
     private void shootWitherSkull() {
+        LivingEntity target = this.getTarget();
+        if (target != null) {
+            double d0 = target.getX() - this.getX();
+            double d1 = target.getY(0.5D) - this.getY(1.0D);
+            double d2 = target.getZ() - this.getZ();
+            net.minecraft.world.phys.Vec3 look = this.getViewVector(1.0F);
+
+            double spawnX = this.getX() + look.x * 1.0D;
+            double spawnY = this.getY(1.5D) - 2.0D;
+            double spawnZ = this.getZ() + look.z * 1.0D;
+            double[] angles = {0.0};
+
+            for (double angle : angles) {
+                double radians = Math.toRadians(angle);
+                double rotX = d0 * Math.cos(radians) - d2 * Math.sin(radians);
+                double rotZ = d0 * Math.sin(radians) + d2 * Math.cos(radians);
+
+                WitherSkull skull = new WitherSkull(this.level(), this, rotX, d1, rotZ);
+                skull.setPos(spawnX, spawnY, spawnZ);
+                skull.xPower *= 1.5D;
+                skull.yPower *= 1.5D;
+                skull.zPower *= 1.5D;
+                this.level().addFreshEntity(skull);
+            }
+            this.playSound(SoundEvents.WITHER_SHOOT, 1.0F, 1.0F);
+        }
+    }
+
+    private void shootThreeWitherSkull() {
         LivingEntity target = this.getTarget();
         if (target != null) {
             double d0 = target.getX() - this.getX();
