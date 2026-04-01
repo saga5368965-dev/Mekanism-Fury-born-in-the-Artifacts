@@ -66,12 +66,16 @@ public class RobyteAreaEntity extends Entity {
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             if (this.bossId != null) {
                 Entity boss = serverLevel.getEntity(this.bossId);
-                if (boss != null) {
-                    if (boss.isRemoved() || !boss.isAlive()) {
+                if (boss == null) {
+                    if (this.tickCount > 20) {
                         clearMonitoredFromAll(serverLevel);
                         this.discard();
                         return;
                     }
+                } else if (boss.isRemoved() || !boss.isAlive()) {
+                    clearMonitoredFromAll(serverLevel);
+                    this.discard();
+                    return;
                 }
             } else {
                 if (this.tickCount > 10) {
