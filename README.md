@@ -1,3 +1,5 @@
+https://img.shields.io/curseforge/v/1500554
+
 <img width="512" height="128" alt="mekribotibossixonbig" src="https://github.com/user-attachments/assets/6bfaac65-10f2-47eb-8c1e-6062d5432943" />
 
 
