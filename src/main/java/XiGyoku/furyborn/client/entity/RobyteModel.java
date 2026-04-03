@@ -1,4 +1,4 @@
-package XiGyoku.furyborn.entity.client;
+package XiGyoku.furyborn.client.entity;
 
 import XiGyoku.furyborn.Furyborn;
 import XiGyoku.furyborn.entity.RobyteEntity;

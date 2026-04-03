@@ -1,4 +1,4 @@
-package XiGyoku.furyborn.entity.client;
+package XiGyoku.furyborn.client.entity;
 
 import XiGyoku.furyborn.entity.RobyteAreaEntity;
 import com.mojang.blaze3d.vertex.PoseStack;

@@ -1,12 +1,9 @@
-package XiGyoku.furyborn.entity.client;
+package XiGyoku.furyborn.client.entity;
 
 import XiGyoku.furyborn.Furyborn;
 import XiGyoku.furyborn.entity.RobyteEntity;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class RobyteRenderer extends GeoEntityRenderer<RobyteEntity> {

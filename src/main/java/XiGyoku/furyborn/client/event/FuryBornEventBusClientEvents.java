@@ -1,4 +1,4 @@
-package XiGyoku.furyborn.event.client;
+package XiGyoku.furyborn.client.event;
 
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
 import net.minecraftforge.api.distmarker.Dist;
