@@ -28,5 +28,26 @@
     "sounds": [
       "furyborn:robyte_getup"
     ]
-  }
+  },
+  "robyte_beamstart": {
+    "category": "hostile",
+    "subtitle": "furyborn.subtitle.robyte_beamstart",
+    "sounds": [
+      "furyborn:robyte_beamstart"
+    ]
+  },
+  "robyte_beaming": {
+    "category": "hostile",
+    "subtitle": "furyborn.subtitle.robyte_beaming",
+    "sounds": [
+      "furyborn:robyte_beaming"
+    ]
+  },
+    "robyte_beamend": {
+        "category": "hostile",
+        "subtitle": "furyborn.subtitle.robyte_beamend",
+        "sounds": [
+        "furyborn:robyte_beamend"
+        ]
+    }
 }
