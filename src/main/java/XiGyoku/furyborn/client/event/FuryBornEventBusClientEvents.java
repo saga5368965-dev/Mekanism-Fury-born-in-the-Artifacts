@@ -1,7 +1,9 @@
 package XiGyoku.furyborn.client.event;
 
+import XiGyoku.furyborn.client.entity.RobyteBitLaserModel;
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -16,5 +18,9 @@ public class FuryBornEventBusClientEvents {
                     RobyteOutOfAreaOverlay.render(guiGraphics, partialTick);
                 }
         );
+    }
+    @SubscribeEvent
+    public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
     }
 }

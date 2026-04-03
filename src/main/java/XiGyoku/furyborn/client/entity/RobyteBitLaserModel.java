@@ -15,7 +15,7 @@ import net.minecraft.world.entity.Entity;
 
 public class RobyteBitLaserModel<T extends Entity> extends EntityModel<T> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("modid", "robyte_bit_laser"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation("furyborn", "robyte_bit_laser"), "main");
     private final ModelPart bb_main;
 
     public RobyteBitLaserModel(ModelPart root) {

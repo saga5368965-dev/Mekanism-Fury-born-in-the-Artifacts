@@ -1,6 +1,8 @@
 package XiGyoku.furyborn;
 
 import XiGyoku.furyborn.block.FuryBornBlocks;
+import XiGyoku.furyborn.client.entity.RobyteBitLaserRenderer;
+import XiGyoku.furyborn.client.entity.RobyteLaserRenderer;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import XiGyoku.furyborn.client.entity.RobyteAreaRenderer;
@@ -118,6 +120,8 @@ public class Furyborn {
 
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE.get(), RobyteRenderer::new);
             EntityRenderers.register(FuryBornEntityTypes.ROBYTE_AREA.get(), RobyteAreaRenderer::new);
+            EntityRenderers.register(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), RobyteBitLaserRenderer::new);
+            EntityRenderers.register(FuryBornEntityTypes.ROBYTE_LASER.get(), RobyteLaserRenderer::new);
         }
     }
 }

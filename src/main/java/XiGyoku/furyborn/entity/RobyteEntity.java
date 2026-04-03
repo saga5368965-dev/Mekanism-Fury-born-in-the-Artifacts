@@ -40,6 +40,7 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import XiGyoku.furyborn.entity.RobyteBitLaserEntity;
 
 import java.util.List;
 
@@ -291,6 +292,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
             if (this.hasEnteredFinalPhase() && !this.isDeadOrDying() && this.phaseTransitionTick == 0) {
                 if (this.tickCount % 15 == 0) {
                     shootFiveWitherSkull();
+                    for (int i = 0; i < 5; i++) {
+                        this.summonBitLaser();
+                    }
                 }
             }
 
@@ -298,6 +302,11 @@ public class RobyteEntity extends Monster implements GeoEntity {
             if (cTick > 0) {
                 this.setCannonTick(cTick + 1);
                 this.getNavigation().stop();
+                if (cTick <= 150) {
+                    if (cTick % 20 == 0) {
+                        this.summonBitLaser();
+                    }
+                }
                 if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
                     shootWitherSkull();
                 }
@@ -357,6 +366,15 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 this.level().addFreshEntity(skull);
             }
             this.playSound(SoundEvents.WITHER_SHOOT, 1.0F, 1.0F);
+        }
+    }
+
+    private void summonBitLaser() {
+        if (!this.level().isClientSide) {
+            RobyteBitLaserEntity bit = new RobyteBitLaserEntity(FuryBornEntityTypes.ROBYTE_BIT_LASER.get(), this.level());
+            bit.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+            bit.setOwner(this);
+            this.level().addFreshEntity(bit);
         }
     }
 

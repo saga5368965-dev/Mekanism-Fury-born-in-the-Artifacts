@@ -1,6 +1,7 @@
 package XiGyoku.furyborn.entity;
 
 import XiGyoku.furyborn.Furyborn;
+import XiGyoku.furyborn.client.entity.RobyteBitLaserRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -8,6 +9,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import XiGyoku.furyborn.entity.RobyteBitLaserEntity;
 
 public class FuryBornEntityTypes {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
@@ -23,8 +25,22 @@ public class FuryBornEntityTypes {
             ENTITY_TYPES.register("robyte_area",
                     () -> EntityType.Builder.of(RobyteAreaEntity::new, MobCategory.MISC)
                             .sized(0.8f,3.0f)
-                            .clientTrackingRange(10)
+                            .clientTrackingRange(64)
                             .build(new ResourceLocation(Furyborn.MODID, "robyte_area").toString()));
+
+    public static final RegistryObject<EntityType<RobyteBitLaserEntity>> ROBYTE_BIT_LASER =
+            ENTITY_TYPES.register("robyte_bit_laser",
+                    () -> EntityType.Builder.of(RobyteBitLaserEntity::new, MobCategory.MISC)
+                            .sized(1.0f,1.0f)
+                            .clientTrackingRange(64)
+                            .build(new ResourceLocation(Furyborn.MODID, "robyte_bit_laser").toString()));
+
+    public static final RegistryObject<EntityType<RobyteLaserEntity>> ROBYTE_LASER =
+            ENTITY_TYPES.register("robyte_laser",
+                    () -> EntityType.Builder.of(RobyteLaserEntity::new, MobCategory.MISC)
+                            .sized(0.5f,0.5f)
+                            .clientTrackingRange(64)
+                            .build(new ResourceLocation(Furyborn.MODID, "robyte_laser").toString()));
 
     public static void register(IEventBus eventBus) {
             ENTITY_TYPES.register(eventBus);
