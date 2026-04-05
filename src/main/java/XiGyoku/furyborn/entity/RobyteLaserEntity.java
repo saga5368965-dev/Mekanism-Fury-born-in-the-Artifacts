@@ -103,8 +103,10 @@ public class RobyteLaserEntity extends Entity {
                 AABB targetBox = target.getBoundingBox().inflate(currentHitRadius);
                 if (targetBox.clip(start, end).isPresent()) {
                     DamageSource source = this.level().damageSources().indirectMagic(this, owner != null ? owner : this);
+                    Vec3 previousMotion = target.getDeltaMovement();
                     target.invulnerableTime = 0;
                     target.hurt(source, 0.5F);
+                    target.setDeltaMovement(previousMotion);
                 }
             }
         }

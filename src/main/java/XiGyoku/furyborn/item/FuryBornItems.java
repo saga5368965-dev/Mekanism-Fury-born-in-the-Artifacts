@@ -54,6 +54,10 @@ public class FuryBornItems {
                     () -> new ForgeSpawnEggItem(FuryBornEntityTypes.ROBYTE, 0xf8f8ff, 0xff0000,
                             new Item.Properties()));
 
+    public static final RegistryObject<Item> BUSTER_THROWER =
+            Furyborn.ITEMS.register("buster_thrower",
+                    () -> new ItemBusterThrower(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus){
     }
 }

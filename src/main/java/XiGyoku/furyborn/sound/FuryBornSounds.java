@@ -23,6 +23,8 @@ public class FuryBornSounds {
 
     public static final RegistryObject<SoundEvent> ROBYTE_BEAMING = registerSoundEvent("robyte_beaming");
 
+    public static final RegistryObject<SoundEvent> ROBYTE_BUSTER = registerSoundEvent("robyte_buster");
+
     public static final RegistryObject<SoundEvent> ROBYTE_BEAMEND = registerSoundEvent("robyte_beamend");
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("furyborn", name)));

@@ -8,6 +8,15 @@
           "type": "minecraft:item",
           "name": "furyborn:robyte_datamodel"
         }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "furyborn:buster_thrower"
+        }
       ],
       "conditions": [
         {

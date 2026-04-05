@@ -49,5 +49,12 @@
         "sounds": [
         "furyborn:robyte_beamend"
         ]
-    }
+    },
+  "robyte_buster": {
+    "category": "hostile",
+    "subtitle": "furyborn.subtitle.robyte_buster",
+    "sounds": [
+      "furyborn:robyte_buster"
+    ]
+  }
 }

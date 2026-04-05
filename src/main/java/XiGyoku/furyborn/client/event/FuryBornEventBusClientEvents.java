@@ -2,6 +2,7 @@ package XiGyoku.furyborn.client.event;
 
 import XiGyoku.furyborn.client.entity.RobyteBitLaserModel;
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
+import XiGyoku.furyborn.client.item.ModelBusterThrower;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -22,5 +23,6 @@ public class FuryBornEventBusClientEvents {
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
+        event.registerLayerDefinition(ModelBusterThrower.BUSTER_THROWER_LAYER, ModelBusterThrower::createLayerDefinition);
     }
 }
