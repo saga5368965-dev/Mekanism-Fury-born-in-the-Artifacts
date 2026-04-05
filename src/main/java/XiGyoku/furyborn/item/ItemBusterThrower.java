@@ -98,7 +98,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
 
     @Override
     public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BOW;
+        return UseAnim.NONE;
     }
 
     @Override
@@ -129,8 +129,8 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
         }
 
         int useTime = this.getUseDuration(stack) - remainingDuration;
-        int chargeTime = 80;
-        int cooldownTime = 40;
+        int chargeTime = 40;
+        int cooldownTime = 20;
         int totalCycle = chargeTime + cooldownTime;
 
         int cycleTime = useTime % totalCycle;
@@ -151,10 +151,10 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
             }
             Vec3 right = look.cross(up).normalize();
             Vec3 beamUp = right.cross(look).normalize();
-            int particlesPerTick = 6;
+            int particlesPerTick = 20;
 
             for (int i = 0; i < particlesPerTick; i++) {
-                double angle = (useTime * 0.5) + (i * Math.PI * 2 / particlesPerTick);
+                double angle = (useTime * 2.0) + (i * Math.PI * 2 / particlesPerTick);
                 Vec3 offset = right.scale(Math.cos(angle) * radius).add(beamUp.scale(Math.sin(angle) * radius));
                 Vec3 particlePos = start.add(look.scale(currentZDist)).add(offset);
 
@@ -174,6 +174,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
 
                 laser.setRadius(10.0F);
                 laser.setMaxLife(400);
+                laser.setDamage(4.0F);
                 laser.setOwner(player);
 
                 level.addFreshEntity(laser);

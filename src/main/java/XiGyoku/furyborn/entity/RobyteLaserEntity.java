@@ -24,6 +24,7 @@ import java.util.UUID;
 public class RobyteLaserEntity extends Entity {
     private static final EntityDataAccessor<Float> RADIUS = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> MAX_LIFE = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(RobyteLaserEntity.class, EntityDataSerializers.FLOAT);
 
     @Nullable private UUID ownerUUID;
     @Nullable private Entity cachedOwner;
@@ -37,6 +38,7 @@ public class RobyteLaserEntity extends Entity {
     protected void defineSynchedData() {
         this.entityData.define(RADIUS, 0.2F);
         this.entityData.define(MAX_LIFE, 40);
+        this.entityData.define(DAMAGE,0.5F);
     }
 
     public void setRadius(float r) { this.entityData.set(RADIUS, r); }
@@ -46,6 +48,10 @@ public class RobyteLaserEntity extends Entity {
     public void setMaxLife(int ticks) { this.entityData.set(MAX_LIFE, ticks); }
 
     public int getMaxLife() { return this.entityData.get(MAX_LIFE); }
+
+    public void setDamage(float damage) { this.entityData.set(DAMAGE, damage); }
+
+    public float getDamage() { return this.entityData.get(DAMAGE); }
 
     public void setOwner(@Nullable Entity owner) {
         if (owner != null) {
@@ -105,7 +111,7 @@ public class RobyteLaserEntity extends Entity {
                     DamageSource source = this.level().damageSources().indirectMagic(this, owner != null ? owner : this);
                     Vec3 previousMotion = target.getDeltaMovement();
                     target.invulnerableTime = 0;
-                    target.hurt(source, 0.5F);
+                    target.hurt(source, this.getDamage());
                     target.setDeltaMovement(previousMotion);
                 }
             }
@@ -116,6 +122,7 @@ public class RobyteLaserEntity extends Entity {
     protected void readAdditionalSaveData(CompoundTag nbt) {
         if (nbt.contains("Radius")) setRadius(nbt.getFloat("Radius"));
         if (nbt.contains("MaxLife")) setMaxLife(nbt.getInt("MaxLife"));
+        if (nbt.contains("Damage")) setDamage(nbt.getFloat("Damage"));
         if (nbt.hasUUID("Owner")) this.ownerUUID = nbt.getUUID("Owner");
     }
 
@@ -123,6 +130,7 @@ public class RobyteLaserEntity extends Entity {
     protected void addAdditionalSaveData(CompoundTag nbt) {
         nbt.putFloat("Radius", getRadius());
         nbt.putInt("MaxLife", getMaxLife());
+        nbt.putFloat("Damage", getDamage());
         if (this.ownerUUID != null) nbt.putUUID("Owner", this.ownerUUID);
     }
 
