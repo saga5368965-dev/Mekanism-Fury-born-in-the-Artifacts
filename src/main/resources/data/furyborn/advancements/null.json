@@ -7,7 +7,7 @@
       "text": "Aftermath"
     },
     "description": {
-      "text": "虚空のデータモデルを手に入れた。一切正体不明だ。"
+      "text": "虚空のデータモデルを手に入れる。一切正体不明だ。"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,

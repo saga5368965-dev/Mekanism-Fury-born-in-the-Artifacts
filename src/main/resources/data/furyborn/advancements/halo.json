@@ -7,7 +7,7 @@
       "text": "Exolumen beyond the stars"
     },
     "description": {
-      "text": "機星ノ赫輪を手に入れた。"
+      "text": "機星ノ赫輪を手に入れる。"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,
