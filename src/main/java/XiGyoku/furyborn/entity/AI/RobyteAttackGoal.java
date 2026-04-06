@@ -28,7 +28,7 @@ public class RobyteAttackGoal extends Goal {
     @Override
     public void start() {
         mob.actionCount++;
-        if (mob.actionCount % 10 == 0 && mob.transamCooldown <= 0) {
+        if (mob.actionCount % 5 == 0 && mob.transamCooldown <= 0) {
             mob.setTransamTick(1);
             mob.setTransamMode(true);
             mob.transamCooldown = 400;
