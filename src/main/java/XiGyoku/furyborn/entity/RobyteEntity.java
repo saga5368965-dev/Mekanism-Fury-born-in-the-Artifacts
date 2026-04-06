@@ -558,6 +558,13 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 int aTick = this.getAttackTick();
                 if (aTick > 0) {
                     this.setAttackTick(aTick + 1);
+
+                    if (aTick > ROTATION_START_DUR && aTick <= ROTATION_START_DUR + ROTATION_LOOP_DUR) {
+                        if (aTick % 100 == 0) {
+                            this.summonPredictBitLaser();
+                        }
+                    }
+
                     if (aTick > ROTATION_TOTAL_ATTACK_DUR) {
                         this.setAttackTick(0);
                         this.attackCooldown = 20;
