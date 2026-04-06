@@ -500,7 +500,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                             this.summonBitLaser();
                         }
                     }
-                    if(this.tickCount % 200 == 0) {
+                    if(this.tickCount % 15 == 0) {
                         for (int i = 0; i < 5; i++) {
                             this.summonPredictBitLaser();
                         }
@@ -542,7 +542,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
                         if (cTick % 20 == 0) {
                             this.summonBitLaser();
                         }
-                        if (cTick % 100 == 0) {
+                        if (cTick % 20 == 0) {
                             this.summonPredictBitLaser();
                         }
                     }
