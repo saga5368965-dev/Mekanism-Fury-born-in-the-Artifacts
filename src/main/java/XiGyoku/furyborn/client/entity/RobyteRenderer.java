@@ -12,6 +12,7 @@ public class RobyteRenderer extends GeoEntityRenderer<RobyteEntity> {
         super(renderManager, new RobyteModel());
         this.shadowRadius = 0.5f;
         this.withScale(2.0f);
+            this.addRenderLayer(new RobyteHaloLayer(this));
     }
 
     @Override
@@ -26,7 +27,7 @@ public class RobyteRenderer extends GeoEntityRenderer<RobyteEntity> {
 
     @Override
     public Color getRenderColor(RobyteEntity animatable, float partialTick, int packedLight) {
-        if (animatable.isTransamMode()) {
+        if (animatable.isTransamMode() || animatable.isRebellion()) {
             return Color.ofRGBA(255, 180, 180, 255);
         }
         return super.getRenderColor(animatable, partialTick, packedLight);

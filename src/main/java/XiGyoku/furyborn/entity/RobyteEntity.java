@@ -60,6 +60,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
     private static final EntityDataAccessor<Float> ALL_RANGE_TRACK_YAW = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> ALL_RANGE_TRACK_PITCH = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> IS_REBELLION = SynchedEntityData.defineId(RobyteEntity.class, EntityDataSerializers.BOOLEAN);
 
     private final ServerBossEvent bossEvent = new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
 
@@ -125,6 +126,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
         this.entityData.define(ALL_RANGE_TICK, 0);
         this.entityData.define(ALL_RANGE_TRACK_YAW, 0.0F);
         this.entityData.define(ALL_RANGE_TRACK_PITCH, 0.0F);
+        this.entityData.define(IS_REBELLION, false);
     }
 
     public int getAttackTick() { return this.entityData.get(ATTACK_TICK); }
@@ -155,6 +157,26 @@ public class RobyteEntity extends Monster implements GeoEntity {
     public void setAllRangeTrackYaw(float v) { this.entityData.set(ALL_RANGE_TRACK_YAW, v); }
     public float getAllRangeTrackPitch() { return this.entityData.get(ALL_RANGE_TRACK_PITCH); }
     public void setAllRangeTrackPitch(float v) { this.entityData.set(ALL_RANGE_TRACK_PITCH, v); }
+
+    public boolean isRebellion() { return this.entityData.get(IS_REBELLION); }
+
+    public void setRebellion(boolean mode) {
+        this.entityData.set(IS_REBELLION, mode);
+        if (mode) {
+            this.setHealth(Integer.MAX_VALUE);
+            this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE).setBaseValue(40.0);
+            this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(5.0);
+            this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.FLYING_SPEED).setBaseValue(30.0);
+        }
+    }
+
+    @Override
+    protected void dropCustomDeathLoot(net.minecraft.world.damagesource.DamageSource source, int looting, boolean recentlyHit) {
+        super.dropCustomDeathLoot(source, looting, recentlyHit);
+        if (this.isRebellion()) {
+            this.spawnAtLocation(XiGyoku.furyborn.item.FuryBornItems.HALO_OF_EXOLUMEN.get());
+        }
+    }
 
     public static AttributeSupplier createAttributes() {
         return Monster.createMonsterAttributes()
@@ -306,6 +328,8 @@ public class RobyteEntity extends Monster implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
+        int multiplier = this.isRebellion() ? 10 : 1;
+
         if (this.level().isClientSide() && !this.isDeadOrDying()) {
             if (!this.hasStartedClientBgm) {
                 ClientSoundHelper.playRobyteBgm(this);
@@ -472,18 +496,22 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
                     if (fTick >= 400) {
                         fTick = 0;
-                        this.shootBigLaserAtPlayer();
+                        for (int i = 0; i < multiplier; i++) {
+                            this.shootBigLaserAtPlayer();
+                        }
                     }
                     this.setFinalLaserTick(fTick);
 
                     if (this.tickCount % 15 == 0) {
-                        shootFiveWitherSkull();
-                        for (int i = 0; i < 5; i++) {
+                        for (int i = 0; i < multiplier; i++) {
+                            shootFiveWitherSkull();
+                        }
+                        for (int i = 0; i < 5 * multiplier; i++) {
                             this.summonBitLaser();
                         }
                     }
                     if(this.tickCount % 15 == 0) {
-                        for (int i = 0; i < 5; i++) {
+                        for (int i = 0; i < 5 * multiplier; i++) {
                             this.summonPredictBitLaser();
                         }
                     }
@@ -529,34 +557,38 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     }
 
                     if (arTick == ALL_RANGE_START_DUR + 1) {
-                        for (int pitch = -60; pitch <= 60; pitch += 30) {
-                            for (int yaw = 0; yaw < 360; yaw += 45) {
-                                RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
-                                laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
-                                laser.setYRot(yaw);
-                                laser.setXRot((float)pitch);
-                                laser.setRadius(1.0F);
-                                laser.setMaxLife(ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR);
-                                laser.setDamage(0.5F);
-                                laser.setOwner(this);
-                                this.level().addFreshEntity(laser);
+                        for (int m = 0; m < multiplier; m++) {
+                            for (int pitch = -60; pitch <= 60; pitch += 30) {
+                                for (int yaw = 0; yaw < 360; yaw += 45) {
+                                    RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+                                    laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                                    laser.setYRot(yaw);
+                                    laser.setXRot((float)pitch);
+                                    laser.setRadius(1.0F);
+                                    laser.setMaxLife(ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR);
+                                    laser.setDamage(0.5F);
+                                    laser.setOwner(this);
+                                    this.level().addFreshEntity(laser);
 
-                                this.allRangeSmallLasers.add(laser);
-                                this.smallLaserInitialYaws.add((float)yaw);
-                                this.smallLaserInitialPitches.add((float)pitch);
+                                    this.allRangeSmallLasers.add(laser);
+                                    this.smallLaserInitialYaws.add((float)yaw);
+                                    this.smallLaserInitialPitches.add((float)pitch);
+                                }
                             }
                         }
 
-                        RobyteLaserEntity bigLaser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
-                        bigLaser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
-                        bigLaser.setYRot(this.getAllRangeTrackYaw());
-                        bigLaser.setXRot(this.getAllRangeTrackPitch());
-                        bigLaser.setRadius(1.0F);
-                        bigLaser.setMaxLife(ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR);
-                        bigLaser.setDamage(1.0F);
-                        bigLaser.setOwner(this);
-                        this.level().addFreshEntity(bigLaser);
-                        this.allRangeBigLaser = bigLaser;
+                        for (int m = 0; m < multiplier; m++) {
+                            RobyteLaserEntity bigLaser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+                            bigLaser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                            bigLaser.setYRot(this.getAllRangeTrackYaw());
+                            bigLaser.setXRot(this.getAllRangeTrackPitch());
+                            bigLaser.setRadius(1.0F);
+                            bigLaser.setMaxLife(ALL_RANGE_LOOP_DUR + ALL_RANGE_END_DUR);
+                            bigLaser.setDamage(1.0F);
+                            bigLaser.setOwner(this);
+                            this.level().addFreshEntity(bigLaser);
+                            this.allRangeBigLaser = bigLaser;
+                        }
                     }
 
                     if (arTick > ALL_RANGE_START_DUR && arTick <= ALL_RANGE_TOTAL_DUR) {
@@ -576,7 +608,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
                         float currentPitch = this.getAllRangeTrackPitch();
                         if (loopTick <= ALL_RANGE_LOOP_DUR) {
                             if (loopTick % 10 == 0) {
-                                this.summonBitLaser();
+                                for (int m = 0; m < multiplier; m++) {
+                                    this.summonBitLaser();
+                                }
                             }
 
                             if (target != null) {
@@ -619,21 +653,25 @@ public class RobyteEntity extends Monster implements GeoEntity {
                 if (tTick > 0) {
                     this.setTransamTick(tTick + 1);
                     if (tTick == 120) {
-                        for (int i = 0; i < 360; i += 30) {
-                            RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
-                            laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
-                            laser.setYRot(i);
-                            laser.setXRot(-30.0F);
-                            laser.setRadius(10.0F);
-                            laser.setMaxLife(400);
-                            laser.setDamage(0.5F);
-                            laser.setOwner(this);
-                            this.level().addFreshEntity(laser);
+                        for (int m = 0; m < multiplier; m++) {
+                            for (int i = 0; i < 360; i += 30) {
+                                RobyteLaserEntity laser = new RobyteLaserEntity(FuryBornEntityTypes.ROBYTE_LASER.get(), this.level());
+                                laser.setPos(this.getX(), this.getY() + 0.5D, this.getZ());
+                                laser.setYRot(i);
+                                laser.setXRot(-30.0F);
+                                laser.setRadius(10.0F);
+                                laser.setMaxLife(400);
+                                laser.setDamage(0.5F);
+                                laser.setOwner(this);
+                                this.level().addFreshEntity(laser);
+                            }
                         }
                     }
                     if (tTick % 100 == 0) {
-                        this.summonBitLaser();
-                        this.summonPredictBitLaser();
+                        for (int m = 0; m < multiplier; m++) {
+                            this.summonBitLaser();
+                            this.summonPredictBitLaser();
+                        }
                     }
                     if (tTick > 120 + ROTATION_TOTAL_ATTACK_DUR) {
                         this.setTransamTick(0);
@@ -648,14 +686,16 @@ public class RobyteEntity extends Monster implements GeoEntity {
                     this.getNavigation().stop();
                     if (cTick <= 150) {
                         if (cTick % 20 == 0) {
-                            this.summonBitLaser();
-                        }
-                        if (cTick % 20 == 0) {
-                            this.summonPredictBitLaser();
+                            for (int m = 0; m < multiplier; m++) {
+                                this.summonBitLaser();
+                                this.summonPredictBitLaser();
+                            }
                         }
                     }
                     if (cTick >= 80 && cTick <= 150 && cTick % 7 == 0) {
-                        shootWitherSkull();
+                        for (int m = 0; m < multiplier; m++) {
+                            shootWitherSkull();
+                        }
                     }
                     if (cTick > CANNON_DUR) {
                         this.setCannonTick(0);
@@ -669,7 +709,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
 
                     if (aTick > ROTATION_START_DUR && aTick <= ROTATION_START_DUR + ROTATION_LOOP_DUR) {
                         if (aTick % 100 == 0) {
-                            this.summonPredictBitLaser();
+                            for (int m = 0; m < multiplier; m++) {
+                                this.summonPredictBitLaser();
+                            }
                         }
                     }
 
@@ -874,6 +916,7 @@ public class RobyteEntity extends Monster implements GeoEntity {
         compoundTag.putBoolean("HasSummonedArea", this.hasSummonedArea);
         compoundTag.putInt("TransamCooldown", this.transamCooldown);
         compoundTag.putInt("ActionCount", this.actionCount);
+        compoundTag.putBoolean("IsRebellion", this.isRebellion());
     }
 
     @Override
@@ -887,6 +930,9 @@ public class RobyteEntity extends Monster implements GeoEntity {
         }
         if (compoundTag.contains("ActionCount")) {
             this.actionCount = compoundTag.getInt("ActionCount");
+        }
+        if (compoundTag.contains("IsRebellion")) {
+            this.setRebellion(compoundTag.getBoolean("IsRebellion"));
         }
     }
 }

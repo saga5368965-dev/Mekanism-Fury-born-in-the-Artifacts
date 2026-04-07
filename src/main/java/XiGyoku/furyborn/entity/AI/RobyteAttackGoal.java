@@ -90,7 +90,7 @@ public class RobyteAttackGoal extends Goal {
                                     player.disableShield(true);
                                 }
 
-                                float damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                                float damage = mob.isRebellion() ? Float.MAX_VALUE : (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
                                 boolean hasHit = entity.hurt(mob.damageSources().mobAttack(mob), damage);
 
                                 if (!hasHit) {
@@ -130,7 +130,7 @@ public class RobyteAttackGoal extends Goal {
             if (aTick % 5 == 0) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
                     if (entity != mob && entity.isAlive()) {
-                        float damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                        float damage = mob.isRebellion() ? Float.MAX_VALUE : (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
                         boolean hasHit = entity.hurt(mob.damageSources().mobAttack(mob), damage);
                         if (hasHit) {
                             mob.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.5F);
