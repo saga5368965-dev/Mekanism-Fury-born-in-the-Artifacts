@@ -29,6 +29,10 @@ public class RobyteLaserEntity extends Entity {
     @Nullable private UUID ownerUUID;
     @Nullable private Entity cachedOwner;
 
+    private boolean isMuted = false;
+
+    public void setMuted(boolean muted) { this.isMuted = muted; }
+
     public RobyteLaserEntity(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.noPhysics = true;
@@ -74,7 +78,7 @@ public class RobyteLaserEntity extends Entity {
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
-            if (this.tickCount == 1) {
+            if (this.tickCount == 1 && !this.isMuted) {
                 this.playSound(FuryBornSounds.ROBYTE_BEAMING.get(), 0.25F, 1.0F);
             }
             if (this.tickCount >= getMaxLife()) {

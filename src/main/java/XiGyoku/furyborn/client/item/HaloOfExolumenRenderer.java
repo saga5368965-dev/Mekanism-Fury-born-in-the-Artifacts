@@ -48,9 +48,12 @@ public class HaloOfExolumenRenderer implements ICurioRenderer {
         ICurioRenderer.translateIfSneaking(poseStack, entity);
         ICurioRenderer.rotateIfSneaking(poseStack, entity);
 
-        poseStack.translate(1.0D, -1.0D, 1.0D);
+        poseStack.translate(XiGyoku.furyborn.Config.haloOffsetX, XiGyoku.furyborn.Config.haloOffsetY, XiGyoku.furyborn.Config.haloOffsetZ);
         poseStack.scale(SCALE_GLOBAL, SCALE_GLOBAL, SCALE_GLOBAL);
-        poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
+
+        poseStack.mulPose(Axis.ZP.rotationDegrees(XiGyoku.furyborn.Config.haloRotZ));
+        poseStack.mulPose(Axis.YP.rotationDegrees(XiGyoku.furyborn.Config.haloRotY));
+        poseStack.mulPose(Axis.XP.rotationDegrees(XiGyoku.furyborn.Config.haloRotX));
 
         poseStack.pushPose();
         poseStack.translate(0, 0, -0.01F);

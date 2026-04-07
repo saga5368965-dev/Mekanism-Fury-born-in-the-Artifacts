@@ -1,51 +1,61 @@
 package XiGyoku.furyborn;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-// An example config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Forge's config APIs
 @Mod.EventBusSubscriber(modid = Furyborn.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-
-    private static final ForgeConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER.comment("Whether to log the dirt block on common setup").define("logDirtBlock", true);
-
-    private static final ForgeConfigSpec.IntValue MAGIC_NUMBER = BUILDER.comment("A magic number").defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
-
-    public static final ForgeConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER.comment("What you want the introduction message to be for the magic number").define("magicNumberIntroduction", "The magic number is... ");
-
-    // a list of strings that are treated as resource locations for items
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER.comment("A list of items to log on common setup.").defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
-
-    static final ForgeConfigSpec SPEC = BUILDER.build();
-
-    public static boolean logDirtBlock;
-    public static int magicNumber;
-    public static String magicNumberIntroduction;
-    public static Set<Item> items;
-
-    private static boolean validateItemName(final Object obj) {
-        return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(new ResourceLocation(itemName));
+    static {
+        BUILDER.push("Halo of Exolumen Settings");
     }
+
+    private static final ForgeConfigSpec.DoubleValue HALO_OFFSET_X = BUILDER
+            .comment("X offset from player for Halo of Exolumen")
+            .defineInRange("haloOffsetX", 1.0, -2.0, 2.0);
+
+    private static final ForgeConfigSpec.DoubleValue HALO_OFFSET_Y = BUILDER
+            .comment("Y offset from player for Halo of Exolumen")
+            .defineInRange("haloOffsetY", -1.0, -2.0, 2.0);
+
+    private static final ForgeConfigSpec.DoubleValue HALO_OFFSET_Z = BUILDER
+            .comment("Z offset from player for Halo of Exolumen")
+            .defineInRange("haloOffsetZ", 1.0, -2.0, 2.0);
+
+    private static final ForgeConfigSpec.DoubleValue HALO_ROTATION_X = BUILDER
+            .comment("X rotation for Halo of Exolumen (Degrees)")
+            .defineInRange("haloRotationX", 180.0, -360.0, 360.0);
+
+    private static final ForgeConfigSpec.DoubleValue HALO_ROTATION_Y = BUILDER
+            .comment("Y rotation for Halo of Exolumen (Degrees)")
+            .defineInRange("haloRotationY", 0.0, -360.0, 360.0);
+
+    private static final ForgeConfigSpec.DoubleValue HALO_ROTATION_Z = BUILDER
+            .comment("Z rotation for Halo of Exolumen (Degrees)")
+            .defineInRange("haloRotationZ", 0.0, -360.0, 360.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    public static final ForgeConfigSpec SPEC = BUILDER.build();
+
+    public static float haloOffsetX;
+    public static float haloOffsetY;
+    public static float haloOffsetZ;
+    public static float haloRotX;
+    public static float haloRotY;
+    public static float haloRotZ;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
-
-        // convert the list of strings into a set of items
-        items = ITEM_STRINGS.get().stream().map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName))).collect(Collectors.toSet());
+        haloOffsetX = HALO_OFFSET_X.get().floatValue();
+        haloOffsetY = HALO_OFFSET_Y.get().floatValue();
+        haloOffsetZ = HALO_OFFSET_Z.get().floatValue();
+        haloRotX = HALO_ROTATION_X.get().floatValue();
+        haloRotY = HALO_ROTATION_Y.get().floatValue();
+        haloRotZ = HALO_ROTATION_Z.get().floatValue();
     }
 }

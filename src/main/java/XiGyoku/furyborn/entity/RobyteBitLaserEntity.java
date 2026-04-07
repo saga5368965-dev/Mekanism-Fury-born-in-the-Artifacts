@@ -29,6 +29,7 @@ public class RobyteBitLaserEntity extends Entity {
     private int lifeTicks = 0;
     private final int moveDuration = 30;
     private final int stopDuration = 200;
+    private boolean isMuted = false;
 
     @Nullable
     private UUID ownerUUID;
@@ -74,6 +75,8 @@ public class RobyteBitLaserEntity extends Entity {
         this.targetEntity = target;
     }
 
+    public void setMuted(boolean muted) { this.isMuted = muted; }
+
     public Entity getOwner() {
         if (this.cachedOwner != null && !this.cachedOwner.isRemoved()) {
             return this.cachedOwner;
@@ -102,7 +105,7 @@ public class RobyteBitLaserEntity extends Entity {
             double curY = Mth.lerp(t, this.startPos.y, this.targetPos.y) + Math.sin(t * Math.PI) * 2.0;
             this.setPos(curX, curY, curZ);
         }
-        if (!this.level().isClientSide && lifeTicks == moveDuration) {
+        if (!this.level().isClientSide && lifeTicks == moveDuration && !this.isMuted) {
             this.playSound(XiGyoku.furyborn.sound.FuryBornSounds.ROBYTE_BEAMSTART.get(), 1.0F, 1.0F);
         }
         if (!this.level().isClientSide && lifeTicks == (moveDuration + 20)) {
@@ -119,6 +122,7 @@ public class RobyteBitLaserEntity extends Entity {
             laser.setMaxLife(200);
             laser.setDamage(this.getDamage());
             laser.setOwner(this);
+            laser.setMuted(this.isMuted);
             this.level().addFreshEntity(laser);
         }
 
