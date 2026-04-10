@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.entity;
 
+import XiGyoku.furyborn.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -45,7 +46,7 @@ public class RobyteLaserEntity extends Entity {
     protected void defineSynchedData() {
         this.entityData.define(RADIUS, 0.2F);
         this.entityData.define(MAX_LIFE, 40);
-        this.entityData.define(DAMAGE,0.5F);
+        this.entityData.define(DAMAGE, Config.ROBYTE_LASER_DAMAGE.get().floatValue());
         this.entityData.define(EXPLOSIVE, false);
         this.entityData.define(OVERCHARGE, false);
     }
@@ -116,7 +117,7 @@ public class RobyteLaserEntity extends Entity {
 
         Vec3 start = this.position();
         Vec3 dir = this.getLookAngle();
-        double length = 200.0D;
+        double length = Config.BUSTER_THROWER_LASER_LENGTH.get().floatValue();
         Vec3 end = start.add(dir.scale(length));
 
         net.minecraft.world.level.ClipContext context = new net.minecraft.world.level.ClipContext(
@@ -134,9 +135,10 @@ public class RobyteLaserEntity extends Entity {
                 float explosionRadius = currentHitRadius * 3.0F;
 
                 if (this.isOvercharge()) {
+                    float destroyRadius = currentHitRadius * 1.5F;
                     AABB destroyBox = new AABB(
-                            end.x - explosionRadius, end.y - explosionRadius, end.z - explosionRadius,
-                            end.x + explosionRadius, end.y + explosionRadius, end.z + explosionRadius
+                            end.x - destroyRadius, end.y - destroyRadius, end.z - destroyRadius,
+                            end.x + destroyRadius, end.y + destroyRadius, end.z + destroyRadius
                     );
                     BlockPos.betweenClosedStream(destroyBox).forEach(pos -> {
                         BlockPos immutablePos = pos.immutable();

@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.entity;
 
+import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -16,14 +17,12 @@ import java.util.UUID;
 public class RobyteAreaEntity extends Entity {
     private UUID bossId = null;
 
-    public RobyteAreaEntity(EntityType<?> pEntityType, Level pLevel)
-    {
+    public RobyteAreaEntity(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.noCulling = true;
     }
 
-    public void setRobyte(RobyteEntity robyte)
-    {
+    public void setRobyte(RobyteEntity robyte) {
         this.bossId = robyte.getUUID();
     }
 
@@ -43,8 +42,8 @@ public class RobyteAreaEntity extends Entity {
     }
 
     public boolean isPlayerInsideArea(Player player) {
-        double radius = 64.0;
-        double height = 64.0;
+        double radius = Config.ROBYTE_AREA_RADIUS.get();
+        double height = Config.ROBYTE_AREA_HEIGHT.get();
         double minX = this.getX() - radius;
         double maxX = this.getX() + radius;
         double minY = this.getY();
@@ -58,8 +57,8 @@ public class RobyteAreaEntity extends Entity {
     }
 
     public boolean isEntityInsideArea(Entity entity) {
-        double radius = 64.0;
-        double height = 64.0;
+        double radius = Config.ROBYTE_AREA_RADIUS.get();
+        double height = Config.ROBYTE_AREA_HEIGHT.get();
         double minX = this.getX() - radius;
         double maxX = this.getX() + radius;
         double minY = this.getY();
@@ -122,9 +121,13 @@ public class RobyteAreaEntity extends Entity {
                             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 2));
                             if (player.tickCount % 20 == 0) {
                                 if (!this.getRobyte().isRebellion()) {
-                                    player.hurt(serverLevel.damageSources().magic(), 2.0F);
+                                    player.hurt(serverLevel.damageSources().magic(), Config.ROBYTE_AREA_DAMAGE.get().floatValue());
                                 } else {
-                                    player.hurt(serverLevel.damageSources().magic(), Float.MAX_VALUE);
+                                    if (Config.ROBYTE_REBELLION_DO_DEATH_ATTACK.get()) {
+                                        player.hurt(serverLevel.damageSources().magic(), Float.MAX_VALUE);
+                                    } else {
+                                        player.hurt(serverLevel.damageSources().magic(), Config.ROBYTE_REBELLION_AREA_DAMAGE.get().floatValue());
+                                    }
                                 }
                             }
                         }

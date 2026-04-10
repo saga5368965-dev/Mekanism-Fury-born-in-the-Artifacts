@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.entity.AI;
 
+import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.entity.RobyteEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,7 +35,7 @@ public class RobyteAttackGoal extends Goal {
             mob.setTransamMode(true);
             mob.transamCooldown = 400;
         } else {
-            boolean canUseAllRange = mob.getHealth() <= mob.getMaxHealth() * 0.7F && !mob.hasEnteredFinalPhase();
+            boolean canUseAllRange = mob.getHealth() <= mob.getMaxHealth() * Config.ROBYTE_ALL_RANGE_MODE_HP_THRESHOLD.get().doubleValue() && !mob.hasEnteredFinalPhase();
             int maxRandom = canUseAllRange ? 3 : 2;
             int r = mob.getRandom().nextInt(maxRandom);
 
@@ -67,7 +68,7 @@ public class RobyteAttackGoal extends Goal {
                 mob.getMoveControl().setWantedPosition(mob.getX(), mob.getY(), mob.getZ(), 0.0D);
             } else {
                 int spinTick = tTick - 120;
-                if (spinTick > mob.ROTATION_START_DUR && spinTick <= mob.ROTATION_START_DUR + mob.TRANSAM_LOOP_DUR) {
+                if (spinTick > mob.ROTATION_START_DUR && spinTick <= mob.ROTATION_START_DUR + mob.getTransamLoopDur()) {
                     double dx = target.getX() - mob.getX();
                     double dy = (target.getY() + target.getEyeHeight() / 2.0D) - mob.getY();
                     double dz = target.getZ() - mob.getZ();
@@ -114,7 +115,7 @@ public class RobyteAttackGoal extends Goal {
                     mob.getMoveControl().setWantedPosition(mob.getX(), mob.getY(), mob.getZ(), 0.0D);
                 }
             }
-        } else if (aTick > mob.ROTATION_START_DUR && aTick <= mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR) {
+        } else if (aTick > mob.ROTATION_START_DUR && aTick <= mob.ROTATION_START_DUR + mob.getRotationLoopDur()) {
             double dx = target.getX() - mob.getX();
             double dy = (target.getY() + target.getEyeHeight() / 2.0D) - mob.getY();
             double dz = target.getZ() - mob.getZ();
@@ -130,7 +131,12 @@ public class RobyteAttackGoal extends Goal {
             if (aTick % 5 == 0) {
                 mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(2.0D)).forEach(entity -> {
                     if (entity != mob && entity.isAlive()) {
-                        float damage = mob.isRebellion() ? Float.MAX_VALUE : (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                        float damage = 0.0F;
+                        if (mob.isRebellion() && Config.ROBYTE_REBELLION_DO_DEATH_ATTACK.get().booleanValue()) {
+                            damage = (float) mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                        } else {
+                            damage = Float.MAX_VALUE;
+                        }
                         boolean hasHit = entity.hurt(mob.damageSources().mobAttack(mob), damage);
                         if (hasHit) {
                             mob.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.5F);
@@ -142,7 +148,7 @@ public class RobyteAttackGoal extends Goal {
                 });
             }
         }
-        if (mob.getCannonTick() > 0 || mob.getAllRangeTick() > 0 || (aTick > 0 && (aTick <= mob.ROTATION_START_DUR || aTick > mob.ROTATION_START_DUR + mob.ROTATION_LOOP_DUR))) {
+        if (mob.getCannonTick() > 0 || mob.getAllRangeTick() > 0 || (aTick > 0 && (aTick <= mob.ROTATION_START_DUR || aTick > mob.ROTATION_START_DUR + mob.getRotationLoopDur()))) {
             mob.getNavigation().stop();
             if (mob.hurtTime == 0) {
                 mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.5D, 0.5D, 0.5D));

@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.mixin;
 
+import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.entity.RobyteEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,9 +22,9 @@ public abstract class LivingEntityMixin extends Entity {
     public void furyborn$getMaxHealth(CallbackInfoReturnable<Float> cir) {
         if ((Object) this instanceof RobyteEntity robyte) {
             if (robyte.isRebellion()) {
-                cir.setReturnValue((float) Integer.MAX_VALUE);
+                cir.setReturnValue(Config.ROBYTE_REBELLION_HP.get().floatValue());
             } else {
-                cir.setReturnValue(2000.0f);
+                cir.setReturnValue(Config.ROBYTE_HP.get().floatValue());
             }
         }
     }

@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.item;
 
+import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import XiGyoku.furyborn.entity.RobyteBitLaserEntity;
 import com.google.common.collect.HashMultimap;
@@ -12,7 +13,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,12 +21,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import top.theillusivec4.curios.api.SlotContext;
@@ -89,21 +83,24 @@ public class HaloOfExolumenItem extends Item implements ICurioItem {
         }
 
         if (entity.level().isClientSide) return;
-        CompoundTag nbt = stack.getOrCreateTag();
-        if (nbt.contains("TargetEntityID")) {
-            int targetId = nbt.getInt("TargetEntityID");
-            Entity target = entity.level().getEntity(targetId);
-            if (target instanceof LivingEntity && target.isAlive()) {
-                int tickCount = nbt.getInt("LaserTick");
-                tickCount++;
-                if (tickCount >= 20) {
-                    fireBitLaser(entity, (LivingEntity) target);
-                    tickCount = 0;
+
+        if (Config.HALO_LASER.get()) {
+            CompoundTag nbt = stack.getOrCreateTag();
+            if (nbt.contains("TargetEntityID")) {
+                int targetId = nbt.getInt("TargetEntityID");
+                Entity target = entity.level().getEntity(targetId);
+                if (target instanceof LivingEntity && target.isAlive()) {
+                    int tickCount = nbt.getInt("LaserTick");
+                    tickCount++;
+                    if (tickCount >= 20) {
+                        fireBitLaser(entity, (LivingEntity) target);
+                        tickCount = 0;
+                    }
+                    nbt.putInt("LaserTick", tickCount);
+                } else {
+                    nbt.remove("TargetEntityID");
+                    nbt.remove("LaserTick");
                 }
-                nbt.putInt("LaserTick", tickCount);
-            } else {
-                nbt.remove("TargetEntityID");
-                nbt.remove("LaserTick");
             }
         }
     }
@@ -111,11 +108,13 @@ public class HaloOfExolumenItem extends Item implements ICurioItem {
     @Override
     public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
         LivingEntity entity = slotContext.entity();
-        if (entity instanceof Player player) {
-            if (!player.isCreative() && !player.isSpectator()) {
-                player.getAbilities().mayfly = false;
-                player.getAbilities().flying = false;
-                player.onUpdateAbilities();
+        if (!(newStack.getItem() instanceof HaloOfExolumenItem)) {
+            if (entity instanceof Player player) {
+                if (!player.isCreative() && !player.isSpectator()) {
+                    player.getAbilities().mayfly = false;
+                    player.getAbilities().flying = false;
+                    player.onUpdateAbilities();
+                }
             }
         }
     }
@@ -126,7 +125,10 @@ public class HaloOfExolumenItem extends Item implements ICurioItem {
             bit.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
             bit.setOwner(player);
             bit.setTarget(target);
-            bit.setDamage(target.getHealth() / 10.0F);
+
+            float damagePercentage = Config.HALO_LASER_DAMAGE.get().floatValue() / 100.0F;
+            bit.setDamage(target.getHealth() * damagePercentage);
+
             player.level().addFreshEntity(bit);
         }
     }

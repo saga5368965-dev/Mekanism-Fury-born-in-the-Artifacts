@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.network;
 
+import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.item.ItemBusterThrower;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
@@ -28,6 +29,9 @@ public class PacketToggleBusterMode {
                     stack = player.getItemInHand(InteractionHand.OFF_HAND);
                 }
                 if (stack.getItem() instanceof ItemBusterThrower) {
+                    if (!Config.BUSTER_THROWER_FLEXIBLE.get()) {
+                        return;
+                    }
                     ItemBusterThrower.cycleBusterMode(stack);
                     int mode = ItemBusterThrower.getBusterMode(stack);
                     String langKey = mode == 2 ? "overcharge" : (mode == 1 ? "explosion" : "none");

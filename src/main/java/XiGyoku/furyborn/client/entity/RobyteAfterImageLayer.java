@@ -16,7 +16,7 @@ public class RobyteAfterImageLayer extends GeoRenderLayer<RobyteEntity> {
 
     @Override
     public void render(PoseStack poseStack, RobyteEntity animatable, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTick, int packedLight, int packedOverlay) {
-        if (animatable.isTransamMode() && !animatable.pastPositions.isEmpty()) {
+        if ((animatable.isTransamMode() || animatable.isRebellion()) && !animatable.pastPositions.isEmpty()) {
             RenderType translucentType = RenderType.entityTranslucent(getTextureResource(animatable));
             net.minecraft.world.phys.Vec3 current = animatable.getPosition(partialTick);
             

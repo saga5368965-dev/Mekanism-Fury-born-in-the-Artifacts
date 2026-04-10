@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.item;
 
+import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.client.item.RenderBusterThrower;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
 import XiGyoku.furyborn.entity.RobyteLaserEntity;
@@ -43,10 +44,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class ItemBusterThrower extends Item implements IItemHUDProvider {
 
-    public static final FloatingLong MAX_ENERGY = FloatingLong.createConst(2500000);
-    public static final FloatingLong ENERGY_COST = FloatingLong.createConst(125000);
-    public static final FloatingLong MAX_ENERGY_COST = FloatingLong.createConst(250000);
     public static final FloatingLong CHARGE_RATE = FloatingLong.createConst(50000);
+
+    public static FloatingLong getMaxEnergy() { return FloatingLong.createConst(Config.BUSTER_THROWER_MAX_CHARGE.get()); }
+    public static FloatingLong getEnergyCost() { return FloatingLong.createConst(Config.BUSTER_THROWER_BASE_COST.get()); }
+    public static FloatingLong getMaxEnergyCost() { return FloatingLong.createConst(Config.BUSTER_THROWER_EXPLOSION_COST.get()); }
+    public static FloatingLong getOverchargeCost() { return FloatingLong.createConst(Config.BUSTER_THROWER_OVERCHARGE_COST.get()); }
 
     public ItemBusterThrower(Properties properties) {
         super(properties);
@@ -56,7 +59,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         return new ItemCapabilityWrapper(stack, RateLimitEnergyHandler.create(
                 () -> CHARGE_RATE,
-                () -> MAX_ENERGY,
+                ItemBusterThrower::getMaxEnergy,
                 BasicEnergyContainer.manualOnly,
                 BasicEnergyContainer.alwaysTrue
         ));
@@ -123,7 +126,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
         if (!player.isCreative()) {
             IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
             int mode = getBusterMode(stack);
-            FloatingLong currentCost = mode == 2 ? MAX_ENERGY : (mode == 1 ? MAX_ENERGY_COST : ENERGY_COST);
+            FloatingLong currentCost = mode == 2 ? getOverchargeCost() : (mode == 1 ? getMaxEnergyCost() : getEnergyCost());
 
             if (energyContainer == null || energyContainer.extract(currentCost, Action.SIMULATE, AutomationType.MANUAL).smallerThan(currentCost)) {
                 return InteractionResultHolder.fail(stack);
@@ -140,7 +143,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
 
         IEnergyContainer energyContainer = StorageUtils.getEnergyContainer(stack, 0);
         int mode = getBusterMode(stack);
-        FloatingLong currentCost = mode == 2 ? MAX_ENERGY : (mode == 1 ? MAX_ENERGY_COST : ENERGY_COST);
+        FloatingLong currentCost = mode == 2 ? getOverchargeCost() : (mode == 1 ? getMaxEnergyCost() : getEnergyCost());
 
         if (!player.isCreative()) {
             if (energyContainer == null || energyContainer.extract(currentCost, Action.SIMULATE, AutomationType.MANUAL).smallerThan(currentCost)) {
@@ -159,8 +162,8 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_BUSTER.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
         if (level.isClientSide && useTime > 0 && cycleTime > 0 && cycleTime <= chargeTime) {
-            double radius = 10.0D;
-            double beamLength = 100.0D;
+            double radius = Config.BUSTER_THROWER_LASER_SIZE.get().floatValue();
+            double beamLength = Config.BUSTER_THROWER_LASER_LENGTH.get().floatValue();
             double progress = (double) cycleTime / chargeTime;
             double currentZDist = progress * beamLength;
 
@@ -198,9 +201,9 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
                 laser.setXRot(player.getXRot());
                 laser.setYRot(player.getYRot());
 
-                laser.setRadius(15.0F);
+                laser.setRadius(Config.BUSTER_THROWER_LASER_SIZE.get().floatValue());
                 laser.setMaxLife(mode == 2 ? 200 : 1000);
-                laser.setDamage(4.0F);
+                laser.setDamage(4.0F * Config.BUSTER_THROWER_DAMAGE.get().floatValue());
                 laser.setExplosive(mode == 1 || mode == 2);
                 laser.setOvercharge(mode == 2);
                 laser.setOwner(player);
@@ -220,6 +223,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
     }
 
     public static void cycleBusterMode(ItemStack stack) {
+        if (!Config.BUSTER_THROWER_FLEXIBLE.get()) return;
         int current = getBusterMode(stack);
         stack.getOrCreateTag().putInt("BusterMode", (current + 1) % 3);
     }
