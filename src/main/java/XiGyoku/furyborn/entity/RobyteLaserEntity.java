@@ -131,7 +131,7 @@ public class RobyteLaserEntity extends Entity {
             end = blockHit.getLocation();
 
             if ((this.isExplosive() || this.isOvercharge()) && this.tickCount % 10 == 0) {
-                float explosionRadius = Math.max(4.0F, currentHitRadius * 1.5F);
+                float explosionRadius = currentHitRadius * 3.0F;
 
                 if (this.isOvercharge()) {
                     AABB destroyBox = new AABB(
