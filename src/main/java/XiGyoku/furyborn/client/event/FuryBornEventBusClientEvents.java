@@ -35,6 +35,12 @@ import java.util.Set;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FuryBornEventBusClientEvents {
+    private enum TooltipMode {
+        NORMAL,
+        FURYBORN,
+        STARRY
+    }
+
     private static volatile Set<Item> cachedFuryBornItems = null;
 
     private static final List<RegistryObject<Item>> FURYBORN_REGISTRY_OBJECTS = List.of(
@@ -58,6 +64,17 @@ public class FuryBornEventBusClientEvents {
     private static final float[] PLANET_RADII = new float[]{ 0.15F, 0.18F, 0.2F, 0.22F, 0.25F };
     private static final float[] ORBIT_SPEEDS = new float[]{ 2.5F, 1.8F, 1.4F, 1.1F, 0.9F };
 
+    private static final String FURYBORN_STARRY_MARKER = ":_FBS_";
+
+    private static final ResourceLocation TOOLTIP_OVERLAY = new ResourceLocation(Furyborn.MODID, "textures/gui/tooltip/tooltip_overlay.png");
+    private static final ResourceLocation[] ANIM_FRAMES = new ResourceLocation[ANIMATION_FRAMES];
+
+    static {
+        for (int i = 0; i < ANIMATION_FRAMES; i++) {
+            ANIM_FRAMES[i] = new ResourceLocation(Furyborn.MODID, "textures/effect/operation/operation_effect_" + (i + 1) + ".png");
+        }
+    }
+
     private static Set<Item> buildCache() {
         Set<Item> set = new HashSet<>();
         for (RegistryObject<Item> ro : FURYBORN_REGISTRY_OBJECTS) {
@@ -80,15 +97,22 @@ public class FuryBornEventBusClientEvents {
         return local;
     }
 
-    private static boolean isFurybornItem(ItemStack stack) {
-        Item item = stack.getItem();
-        return getFuryBornItemsCache().contains(item);
+    private static TooltipMode getTooltipMode(ItemStack stack) {
+        if (stack.isEmpty()) return TooltipMode.NORMAL;
+
+        String displayName = stack.getHoverName().getString();
+        if (displayName.contains(FURYBORN_STARRY_MARKER)) return TooltipMode.STARRY;
+
+        if (getFuryBornItemsCache().contains(stack.getItem())) return TooltipMode.FURYBORN;
+
+        return TooltipMode.NORMAL;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onRenderTooltipPre(RenderTooltipEvent.Pre event) {
         ItemStack stack = event.getItemStack();
-        if (!isFurybornItem(stack)) return;
+        TooltipMode mode = getTooltipMode(stack);
+        if (mode == TooltipMode.NORMAL) return;
 
         event.setCanceled(true);
 
@@ -100,11 +124,12 @@ public class FuryBornEventBusClientEvents {
                 event.getScreenWidth(),
                 event.getScreenHeight(),
                 event.getComponents(),
-                stack
+                stack,
+                mode
         );
     }
 
-    private static void renderHaloBackground(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, long timeMs) {
+    public static void renderHaloBackground(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, long timeMs) {
         float ticks = (timeMs % 1000000L) / 50.0F;
         int packedLight = 15728880;
 
@@ -200,7 +225,8 @@ public class FuryBornEventBusClientEvents {
             int screenWidth,
             int screenHeight,
             List<ClientTooltipComponent> components,
-            ItemStack stack
+            ItemStack stack,
+            TooltipMode mode
     ) {
         int tooltipWidth = 0;
         int tooltipHeight = components.size() == 1 ? -2 : 0;
@@ -215,37 +241,48 @@ public class FuryBornEventBusClientEvents {
         int bgX = x + 10;
         int bgY = y - (bgHeight / 2);
 
-        int tooltipLeftOffset = 15;
-        int tooltipTopOffset = 3;
+        if (bgX + bgWidth > screenWidth) bgX = x - bgWidth - 10;
+        if (bgY + bgHeight > screenHeight) bgY = screenHeight - bgHeight;
+        if (bgY < 0) bgY = 0;
 
         int centerX = bgX + (bgWidth / 2);
         int centerY = bgY + (bgHeight / 2);
 
-        float overlayScale = 0.375F;
-        int overlayActualWidth = (int) (64 * overlayScale);
-        int overlayX = bgX + (bgWidth / 2) - (overlayActualWidth / 2);
-        int overlayY = (int) (bgY - (11 * overlayScale)) + 2 ;
-
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
-
         poseStack.translate(0, 0, 400);
 
         long time = System.currentTimeMillis();
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
 
-        int bgColor = 0xF0100010;
-        int borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
-        int borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
+        if (mode == TooltipMode.FURYBORN) {
+            int bgColor = 0xF0100010;
+            int borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
+            int borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
 
-        guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + bgHeight, bgColor, bgColor);
-        guiGraphics.fillGradient(bgX, bgY, overlayX, bgY + 1, borderColorTop, borderColorTop);
-        guiGraphics.fillGradient(overlayX + overlayActualWidth, bgY, bgX + bgWidth, bgY + 1, borderColorTop, borderColorTop);
-        guiGraphics.fillGradient(bgX, bgY + bgHeight - 1, bgX + bgWidth, bgY + bgHeight, borderColorBottom, borderColorBottom);
-        guiGraphics.fillGradient(bgX, bgY, bgX + 1, bgY + bgHeight, borderColorTop, borderColorBottom);
-        guiGraphics.fillGradient(bgX + bgWidth - 1, bgY, bgX + bgWidth, bgY + bgHeight, borderColorTop, borderColorBottom);
+            float overlayScale = 0.375F;
+            int overlayActualWidth = (int) (64 * overlayScale);
+            int overlayX = bgX + (bgWidth / 2) - (overlayActualWidth / 2);
 
-        ColorUtil.drawEnergeticLine(guiGraphics, bgX, bgY, bgWidth, bgHeight, time);
+            guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + bgHeight, bgColor, bgColor);
+            guiGraphics.fillGradient(bgX, bgY, overlayX, bgY + 1, borderColorTop, borderColorTop);
+            guiGraphics.fillGradient(overlayX + overlayActualWidth, bgY, bgX + bgWidth, bgY + 1, borderColorTop, borderColorTop);
+            guiGraphics.fillGradient(bgX, bgY + bgHeight - 1, bgX + bgWidth, bgY + bgHeight, borderColorBottom, borderColorBottom);
+            guiGraphics.fillGradient(bgX, bgY, bgX + 1, bgY + bgHeight, borderColorTop, borderColorBottom);
+            guiGraphics.fillGradient(bgX + bgWidth - 1, bgY, bgX + bgWidth, bgY + bgHeight, borderColorTop, borderColorBottom);
+
+            ColorUtil.drawEnergeticLine(guiGraphics, bgX, bgY, bgWidth, bgHeight, time);
+        } else {
+            int vanillaBg = 0xF0100010;
+            int vBorder1 = 0x505000FF;
+            int vBorder2 = 0x5028007F;
+
+            guiGraphics.fill(bgX, bgY, bgX + bgWidth, bgY + bgHeight, vanillaBg);
+            guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + 1, vBorder1, vBorder1);
+            guiGraphics.fillGradient(bgX, bgY + bgHeight - 1, bgX + bgWidth, bgY + bgHeight, vBorder2, vBorder2);
+            guiGraphics.fillGradient(bgX, bgY, bgX + 1, bgY + bgHeight, vBorder1, vBorder2);
+            guiGraphics.fillGradient(bgX + bgWidth - 1, bgY, bgX + bgWidth, bgY + bgHeight, vBorder1, vBorder2);
+        }
 
         poseStack.pushPose();
         poseStack.translate(centerX, centerY, 0);
@@ -253,35 +290,42 @@ public class FuryBornEventBusClientEvents {
         buffer.endBatch(RenderType.lightning());
         poseStack.popPose();
 
-        poseStack.pushPose();
-        poseStack.translate(0, 0, 100);
+        if (mode == TooltipMode.FURYBORN) {
+            poseStack.pushPose();
+            poseStack.translate(0, 0, 100);
 
-        int currentFrame = (int) (((time % 100000L) / FRAME_DURATION) % ANIMATION_FRAMES) + 1;
-        ResourceLocation animTexture = new ResourceLocation(Furyborn.MODID, "textures/effect/operation/operation_effect_" + currentFrame + ".png");
+            int frameIndex = (int) (((time % 100000L) / FRAME_DURATION) % ANIMATION_FRAMES);
+            ResourceLocation animTexture = ANIM_FRAMES[frameIndex];
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.2F);
-        guiGraphics.blit(animTexture, bgX, bgY, 0, 0, bgWidth, bgHeight, bgWidth, bgHeight);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.enableBlend();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.2F);
+            guiGraphics.blit(animTexture, bgX, bgY, 0, 0, bgWidth, bgHeight, bgWidth, bgHeight);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        ResourceLocation overlayTexture = new ResourceLocation(Furyborn.MODID, "textures/gui/tooltip/tooltip_overlay.png");
-        poseStack.pushPose();
-        poseStack.translate(overlayX, overlayY, 0);
-        poseStack.scale(overlayScale, overlayScale, 1.0F);
-        guiGraphics.blit(overlayTexture, 0, 0, 0, 0, 64, 30, 64, 64);
-        poseStack.popPose();
+            ResourceLocation overlayTexture = TOOLTIP_OVERLAY;
+            float overlayScale = 0.375F;
+            int overlayX = bgX + (bgWidth / 2) - (int)((64 * overlayScale) / 2);
+            int overlayY = (int) (bgY - (11 * overlayScale)) + 2;
 
-        RenderSystem.disableBlend();
-        poseStack.popPose();
+            poseStack.pushPose();
+            poseStack.translate(overlayX, overlayY, 0);
+            poseStack.scale(overlayScale, overlayScale, 1.0F);
+            guiGraphics.blit(overlayTexture, 0, 0, 0, 0, 64, 30, 64, 64);
+            poseStack.popPose();
+
+            RenderSystem.disableBlend();
+            poseStack.popPose();
+        }
 
         poseStack.pushPose();
         poseStack.translate(0, 0, 250);
-
+        int tooltipLeftOffset = 5;
+        int tooltipTopOffset = 3;
         int offsetY = bgY + tooltipTopOffset;
+
         for (ClientTooltipComponent comp : components) {
             if (comp instanceof ClientTextTooltip textTooltip) {
-                textTooltip.renderText(font, x + tooltipLeftOffset, offsetY, poseStack.last().pose(), buffer);
+                textTooltip.renderText(font, bgX + tooltipLeftOffset, offsetY, poseStack.last().pose(), buffer);
             }
             offsetY += comp.getHeight();
         }
@@ -290,7 +334,7 @@ public class FuryBornEventBusClientEvents {
         offsetY = bgY + tooltipTopOffset;
         for (ClientTooltipComponent comp : components) {
             if (!(comp instanceof ClientTextTooltip)) {
-                comp.renderImage(font, x, offsetY, guiGraphics);
+                comp.renderImage(font, bgX + tooltipLeftOffset - 3, offsetY, guiGraphics);
             }
             offsetY += comp.getHeight();
         }

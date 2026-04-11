@@ -17,7 +17,7 @@ public abstract class ItemStackMixin {
 
         if (stack.getItem() == FuryBornItems.HALO_OF_EXOLUMEN.get()) {
             String originalName = cir.getReturnValue().getString();
-            cir.setReturnValue(Component.literal(originalName + ":_F_B"));
+            cir.setReturnValue(Component.literal(originalName + ":_FB_"));
         }
     }
 }

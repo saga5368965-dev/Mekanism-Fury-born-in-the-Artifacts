@@ -20,7 +20,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class FontMixin {
 
     @Unique
-    private static final String FURYBORN_MARKER = ":_F_B";
+    private static final String FURYBORN_MARKER = ":_FB_";
+
+    @Unique
+    private static final String FURYBORN_STARRY_MARKER = ":_FBS_";
 
     @Unique
     private static final ResourceLocation ZEN_OLD_MINCHO = new ResourceLocation(Furyborn.MODID, "zen_old_mincho");
@@ -31,6 +34,12 @@ public abstract class FontMixin {
             String cleanText = text.replace(FURYBORN_MARKER, "");
             handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
             cir.setReturnValue(1);
+            cir.cancel();
+        }
+        if (text != null && text.contains(FURYBORN_STARRY_MARKER)) {
+            String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
+            Font font = (Font) (Object) this;
+            cir.setReturnValue(font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor, p_273022_));
             cir.cancel();
         }
     }
@@ -45,6 +54,12 @@ public abstract class FontMixin {
                 cir.setReturnValue(1);
                 cir.cancel();
             }
+            if (text.contains(FURYBORN_STARRY_MARKER)) {
+                String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
+                Font font = (Font) (Object) this;
+                cir.setReturnValue(font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor));
+                cir.cancel();
+            }
         }
     }
 
@@ -53,9 +68,16 @@ public abstract class FontMixin {
         if (sequence != null) {
             String text = formatSeqToString(sequence);
             if (text.contains(FURYBORN_MARKER)) {
-                String cleanText = text.replace(FURYBORN_MARKER, "");
+                String marker = text.contains(FURYBORN_MARKER) ? FURYBORN_MARKER : FURYBORN_STARRY_MARKER;
+                String cleanText = text.replace(marker, "");
                 handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
                 cir.setReturnValue(1);
+                cir.cancel();
+            }
+            if (text.contains(FURYBORN_STARRY_MARKER)) {
+                String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
+                Font font = (Font) (Object) this;
+                cir.setReturnValue(font.drawInBatch(cleanText, x, y, color, dropShadow, matrix, bufferSource, displayMode, packedLight, backgroundColor));
                 cir.cancel();
             }
         }
@@ -69,6 +91,12 @@ public abstract class FontMixin {
                 String cleanText = text.replace(FURYBORN_MARKER, "");
                 handleHaloText(cleanText, x, y, matrix, bufferSource, displayMode, packedLight);
                 cir.setReturnValue(1.0f);
+                cir.cancel();
+            }
+            if (text.contains(FURYBORN_STARRY_MARKER)) {
+                String cleanText = text.replace(FURYBORN_STARRY_MARKER, "");
+                Font font = (Font) (Object) this;
+                cir.setReturnValue((float) font.width(cleanText));
                 cir.cancel();
             }
         }
