@@ -41,6 +41,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.theillusivec4.curios.api.CuriosApi;
 
 public class ItemBusterThrower extends Item implements IItemHUDProvider {
 
@@ -207,6 +208,10 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
                 laser.setExplosive(mode == 1 || mode == 2);
                 laser.setOvercharge(mode == 2);
                 laser.setOwner(player);
+
+                if (CuriosApi.getCuriosHelper().findEquippedCurio(s -> s.getItem() instanceof HaloOfExolumenItem, player).isPresent()) {
+                    laser.setBadAttack(true);
+                }
 
                 level.addFreshEntity(laser);
             }

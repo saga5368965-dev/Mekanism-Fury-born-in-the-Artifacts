@@ -35,6 +35,7 @@ public class RobyteLaserEntity extends Entity {
     @Nullable private Entity cachedOwner;
 
     private boolean isMuted = false;
+    private boolean isNaturalDeath = false;
 
     public void setMuted(boolean muted) { this.isMuted = muted; }
 
@@ -113,6 +114,7 @@ public class RobyteLaserEntity extends Entity {
         }
 
         if (this.tickCount >= getMaxLife()) {
+            this.isNaturalDeath = true;
             this.discard();
             return;
         }
@@ -199,16 +201,26 @@ public class RobyteLaserEntity extends Entity {
                 Vec3 previousMotion = target.getDeltaMovement();
                 target.invulnerableTime = 0;
                 float appliedDamage = this.getDamage() * (this.isExplosive() ? 2.0F : 1.0F);
+
                 if (this.getBadAttack()) {
                     float currentHealth = livingTargetCasted.getHealth();
                     float newHealth = Math.max(0.0F, currentHealth - appliedDamage);
                     livingTargetCasted.setHealth(newHealth);
                     livingTargetCasted.hurt(source, appliedDamage);
                 }
+
                 target.hurt(source, this.getDamage() * (this.isExplosive() ? 2.0F : 1.0F));
                 target.setDeltaMovement(previousMotion);
             }
         }
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (this.getBadAttack() && !this.isNaturalDeath && (reason == RemovalReason.DISCARDED || reason == RemovalReason.KILLED)) {
+            return;
+        }
+        super.remove(reason);
     }
 
     @Override

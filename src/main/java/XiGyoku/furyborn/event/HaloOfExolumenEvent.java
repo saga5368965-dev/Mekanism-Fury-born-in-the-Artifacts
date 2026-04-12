@@ -5,6 +5,7 @@ import XiGyoku.furyborn.sound.FuryBornSounds;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -16,6 +17,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod.EventBusSubscriber(modid = "furyborn", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HaloOfExolumenEvent {
+
     @SubscribeEvent
     public static void onLivingAttack(LivingAttackEvent event) {
         LivingEntity entity = event.getEntity();
@@ -41,7 +43,14 @@ public class HaloOfExolumenEvent {
         if (entity.level().isClientSide) return;
 
         if (CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.getItem() instanceof HaloOfExolumenItem, entity).isPresent()) {
-            event.setAmount(event.getAmount() * 0.5F);
+            event.setAmount(event.getAmount() * 0.1F);
+        }
+
+        Entity attackerEntity = event.getSource().getEntity();
+        if (attackerEntity instanceof LivingEntity attacker) {
+            if (CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.getItem() instanceof HaloOfExolumenItem, attacker).isPresent()) {
+                event.setAmount(event.getAmount() * 10.0F);
+            }
         }
     }
 
@@ -49,6 +58,7 @@ public class HaloOfExolumenEvent {
     public static void onLivingDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntity();
         if (entity.level().isClientSide()) return;
+
         CuriosApi.getCuriosHelper().findFirstCurio(entity, stack -> stack.getItem() instanceof HaloOfExolumenItem).ifPresent(curio -> {
             event.setCanceled(true);
             entity.setHealth(entity.getMaxHealth());

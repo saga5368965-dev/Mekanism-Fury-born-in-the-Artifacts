@@ -1,5 +1,6 @@
 package XiGyoku.furyborn.client.event;
 
+import XiGyoku.furyborn.Config;
 import XiGyoku.furyborn.Furyborn;
 import XiGyoku.furyborn.item.FuryBornItems;
 import XiGyoku.furyborn.client.util.ColorUtil;
@@ -59,8 +60,6 @@ public class FuryBornEventBusClientEvents {
             new Vector4f(0.8F, 0.2F, 1.0F, 1.0F)
     };
 
-    private static final float HALO_GUI_SCALE = 120.0F;
-    private static final float[] ORBIT_RADII = new float[]{ 1.0F, 1.5F, 2.0F, 2.5F, 3.0F };
     private static final float[] PLANET_RADII = new float[]{ 0.15F, 0.18F, 0.2F, 0.22F, 0.25F };
     private static final float[] ORBIT_SPEEDS = new float[]{ 2.5F, 1.8F, 1.4F, 1.1F, 0.9F };
 
@@ -108,6 +107,47 @@ public class FuryBornEventBusClientEvents {
         return TooltipMode.NORMAL;
     }
 
+    private static float getOrbitRadius(int index) {
+        if (index == 0) return 1.0F;
+        return 1.0F + (index * Config.TOOLTIP_HALO_ORBIT_SPACING.get().floatValue());
+    }
+
+    private static float getPlanetRadius(int index) {
+        if (index < PLANET_RADII.length) return PLANET_RADII[index];
+        return PLANET_RADII[PLANET_RADII.length - 1] + (index - PLANET_RADII.length + 1) * 0.02F;
+    }
+
+    private static float getOrbitSpeed(int index) {
+        float speed;
+        if (index < ORBIT_SPEEDS.length) {
+            speed = ORBIT_SPEEDS[index];
+        } else {
+            speed = (float) (ORBIT_SPEEDS[ORBIT_SPEEDS.length - 1] * Math.pow(0.8, index - ORBIT_SPEEDS.length + 1));
+        }
+        return speed * Config.TOOLTIP_HALO_ROTATION_SPEED_MULTIPLIER.get().floatValue();
+    }
+
+    private static Vector4f getUnifiedColor() {
+        String hex = Config.TOOLTIP_HALO_UNIFIED_PLANET_COLOR.get();
+        try {
+            if (hex.startsWith("#")) hex = hex.substring(1);
+            int color = (int) Long.parseLong(hex, 16);
+            float r = ((color >> 16) & 0xFF) / 255.0f;
+            float g = ((color >> 8) & 0xFF) / 255.0f;
+            float b = (color & 0xFF) / 255.0f;
+            return new Vector4f(r, g, b, 1.0f);
+        } catch (Exception e) {
+            return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+    }
+
+    private static Vector4f getPlanetColor(int index) {
+        if (Config.TOOLTIP_HALO_UNIFY_PLANET_COLOR.get()) {
+            return getUnifiedColor();
+        }
+        return COLORS_PLANETS[index % COLORS_PLANETS.length];
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onRenderTooltipPre(RenderTooltipEvent.Pre event) {
         ItemStack stack = event.getItemStack();
@@ -132,18 +172,24 @@ public class FuryBornEventBusClientEvents {
     public static void renderHaloBackground(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, long timeMs) {
         float ticks = (timeMs % 1000000L) / 50.0F;
         int packedLight = 15728880;
+        float haloGuiScale = 120.0F * Config.TOOLTIP_HALO_SCALE.get().floatValue();
 
         poseStack.pushPose();
 
-        float angleX = (timeMs % 12000L) / 12000.0F * 360.0F;
-        float angleY = (timeMs % 16000L) / 16000.0F * 360.0F;
-        float angleZ = (timeMs % 20000L) / 20000.0F * 360.0F;
+        boolean individualRotation = Config.TOOLTIP_HALO_INDIVIDUAL_ROTATION.get();
+        int orbitCount = Config.TOOLTIP_HALO_ORBIT_COUNT.get();
 
-        poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(angleX));
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(angleY));
-        poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(angleZ));
+        if (!individualRotation) {
+            float angleX = (timeMs % 12000L) / 12000.0F * 360.0F;
+            float angleY = (timeMs % 16000L) / 16000.0F * 360.0F;
+            float angleZ = (timeMs % 20000L) / 20000.0F * 360.0F;
 
-        poseStack.scale(HALO_GUI_SCALE, HALO_GUI_SCALE, HALO_GUI_SCALE);
+            poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(angleX));
+            poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(angleY));
+            poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(angleZ));
+        }
+
+        poseStack.scale(haloGuiScale, haloGuiScale, haloGuiScale);
 
         RenderSystem.disableCull();
         RenderSystem.enableDepthTest();
@@ -154,16 +200,28 @@ public class FuryBornEventBusClientEvents {
 
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.lightning());
 
-        for (int i = 0; i < 5; i++) {
-            float radius = ORBIT_RADII[i];
-            GeometryHelper.drawRing(poseStack, consumer, radius, 0.02F, COLOR_ORBIT, packedLight);
-        }
+        for (int i = 0; i < orbitCount; i++) {
+            poseStack.pushPose();
 
-        for (int i = 0; i < 5; i++) {
-            float radius = ORBIT_RADII[i];
-            float speed = ORBIT_SPEEDS[i];
-            float basePlanetSize = PLANET_RADII[i];
-            Vector4f basePlanetColor = COLORS_PLANETS[i];
+            if (individualRotation) {
+                double speedMod = 1.0 + (i * 0.15);
+                double scaledTime = timeMs * speedMod;
+
+                float angleX = (float) ((scaledTime % 12000.0) / 12000.0 * 360.0);
+                float angleY = (float) ((scaledTime % 16000.0) / 16000.0 * 360.0);
+                float angleZ = (float) ((scaledTime % 20000.0) / 20000.0 * 360.0);
+
+                poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(angleX));
+                poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(angleY));
+                poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(angleZ));
+            }
+
+            float radius = getOrbitRadius(i);
+            GeometryHelper.drawRing(poseStack, consumer, radius, 0.02F, COLOR_ORBIT, packedLight);
+
+            float speed = getOrbitSpeed(i);
+            float basePlanetSize = getPlanetRadius(i);
+            Vector4f basePlanetColor = getPlanetColor(i);
 
             int trailSteps = 20;
             float trailLengthTicks = 15.0F;
@@ -207,6 +265,8 @@ public class FuryBornEventBusClientEvents {
             float currentAngle = (ticks * 0.1F * speed) % (Mth.PI * 2.0F);
             poseStack.translate(Mth.cos(currentAngle) * radius, Mth.sin(currentAngle) * radius, 0.0F);
             GeometryHelper.drawSphere(poseStack, consumer, basePlanetSize, basePlanetColor, packedLight);
+            poseStack.popPose();
+
             poseStack.popPose();
         }
 

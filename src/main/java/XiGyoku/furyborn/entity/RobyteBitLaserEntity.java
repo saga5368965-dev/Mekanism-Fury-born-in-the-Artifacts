@@ -10,8 +10,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -31,6 +29,7 @@ public class RobyteBitLaserEntity extends Entity {
     private final int moveDuration = 30;
     private final int stopDuration = 200;
     private boolean isMuted = false;
+    private boolean isNaturalDeath = false;
 
     @Nullable
     private UUID ownerUUID;
@@ -134,9 +133,20 @@ public class RobyteBitLaserEntity extends Entity {
         }
 
         if (lifeTicks >= moveDuration + stopDuration) {
-            if (!this.level().isClientSide) this.discard();
+            if (!this.level().isClientSide) {
+                this.isNaturalDeath = true;
+                this.discard();
+            }
         }
         lifeTicks++;
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        if (this.getBadAttack() && !this.isNaturalDeath && (reason == RemovalReason.DISCARDED || reason == RemovalReason.KILLED)) {
+            return;
+        }
+        super.remove(reason);
     }
 
     private void smoothLookAtTarget() {
