@@ -44,7 +44,7 @@ public class PacketDirectionalDash {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player != null) {
+            if (player != null && player.getPersistentData().getBoolean("ExolumenAfterImage")) {
                 float yawRad = player.getYRot() * ((float) Math.PI / 180F);
 
                 double fwdX = -Mth.sin(yawRad);

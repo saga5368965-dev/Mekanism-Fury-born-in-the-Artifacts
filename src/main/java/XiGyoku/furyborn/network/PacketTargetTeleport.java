@@ -25,7 +25,7 @@ public class PacketTargetTeleport {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player != null) {
+            if (player != null && player.getPersistentData().getBoolean("ExolumenAfterImage")) {
                 AABB box = player.getBoundingBox().inflate(20.0D);
                 List<LivingEntity> entities = player.level().getEntitiesOfClass(LivingEntity.class, box, e -> e != player && e.isAlive() && e instanceof Enemy);
 

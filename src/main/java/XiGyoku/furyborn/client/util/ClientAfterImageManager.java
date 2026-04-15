@@ -33,8 +33,10 @@ public class ClientAfterImageManager {
                 float netHeadYaw = player.getYHeadRot() - player.yBodyRot;
                 float headPitch = player.getXRot();
                 float bodyYaw = player.yBodyRot;
+                boolean swinging = player.swinging;
+                int swingTime = player.swingTime;
 
-                list.add(0, new AfterImageData(player.position(), limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, bodyYaw));
+                list.add(0, new AfterImageData(player.position(), limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, bodyYaw, swinging, swingTime));
 
                 if (list.size() > 20) {
                     list.remove(list.size() - 1);

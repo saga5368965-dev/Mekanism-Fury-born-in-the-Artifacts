@@ -2,6 +2,8 @@ package XiGyoku.furyborn.client.event;
 
 import XiGyoku.furyborn.item.HaloOfExolumenItem;
 import XiGyoku.furyborn.item.ItemBusterThrower;
+import XiGyoku.furyborn.item.SunRaiserDriveItem;
+import XiGyoku.furyborn.item.SystemXrossAliveItem;
 import XiGyoku.furyborn.network.FuryBornNetwork;
 import XiGyoku.furyborn.network.PacketDirectionalDash;
 import XiGyoku.furyborn.network.PacketShootLaserBit;
@@ -45,7 +47,7 @@ public class ClientKeyInputEvent {
         while (FuryBornModClientEvents.TOGGLE_AFTERIMAGE.consumeClick()) {
             Player player = mc.player;
             if (player != null) {
-                if (CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.getItem() instanceof HaloOfExolumenItem, player).isPresent()) {
+                if (CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.getItem() instanceof SunRaiserDriveItem, player).isPresent()) {
                     boolean currentState = player.getPersistentData().getBoolean("ExolumenAfterImage");
                     player.getPersistentData().putBoolean("ExolumenAfterImage", !currentState);
                     FuryBornNetwork.CHANNEL.sendToServer(new PacketToggleAfterImage());
@@ -55,21 +57,45 @@ public class ClientKeyInputEvent {
         while (FuryBornModClientEvents.DRIVESHIFT_DASH.consumeClick()) {
             Player player = mc.player;
             if (player != null && player.getPersistentData().getBoolean("ExolumenAfterImage")) {
-                boolean f = mc.options.keyUp.isDown();
-                boolean b = mc.options.keyDown.isDown();
-                boolean l = mc.options.keyLeft.isDown();
-                boolean r = mc.options.keyRight.isDown();
-                boolean u = mc.options.keyJump.isDown();
-                boolean d = mc.options.keyShift.isDown();
-                player.getPersistentData().putInt("DriveshiftGreenTicks", 40);
-                FuryBornNetwork.CHANNEL.sendToServer(new PacketDirectionalDash(f, b, l, r, u, d));
+                int[] driveCount = {0};
+                int[] xrossCount = {0};
+                CuriosApi.getCuriosHelper().getEquippedCurios(player).ifPresent(handler -> {
+                    for (int i = 0; i < handler.getSlots(); i++) {
+                        ItemStack curioStack = handler.getStackInSlot(i);
+                        if (curioStack.getItem() instanceof SunRaiserDriveItem) driveCount[0] += curioStack.getCount();
+                        if (curioStack.getItem() instanceof SystemXrossAliveItem) xrossCount[0] += curioStack.getCount();
+                    }
+                });
+
+                if (driveCount[0] >= 2 && xrossCount[0] >= 1) {
+                    boolean f = mc.options.keyUp.isDown();
+                    boolean b = mc.options.keyDown.isDown();
+                    boolean l = mc.options.keyLeft.isDown();
+                    boolean r = mc.options.keyRight.isDown();
+                    boolean u = mc.options.keyJump.isDown();
+                    boolean d = mc.options.keyShift.isDown();
+                    player.getPersistentData().putInt("DriveshiftGreenTicks", 40);
+                    FuryBornNetwork.CHANNEL.sendToServer(new PacketDirectionalDash(f, b, l, r, u, d));
+                }
             }
         }
         while (FuryBornModClientEvents.DRIVESHIFT_BACKSTAB.consumeClick()) {
             Player player = mc.player;
             if (player != null && player.getPersistentData().getBoolean("ExolumenAfterImage")) {
-                player.getPersistentData().putInt("DriveshiftGreenTicks", 40);
-                FuryBornNetwork.CHANNEL.sendToServer(new PacketTargetTeleport());
+                int[] driveCount = {0};
+                int[] xrossCount = {0};
+                CuriosApi.getCuriosHelper().getEquippedCurios(player).ifPresent(handler -> {
+                    for (int i = 0; i < handler.getSlots(); i++) {
+                        ItemStack curioStack = handler.getStackInSlot(i);
+                        if (curioStack.getItem() instanceof SunRaiserDriveItem) driveCount[0] += curioStack.getCount();
+                        if (curioStack.getItem() instanceof SystemXrossAliveItem) xrossCount[0] += curioStack.getCount();
+                    }
+                });
+
+                if (driveCount[0] >= 2 && xrossCount[0] >= 1) {
+                    player.getPersistentData().putInt("DriveshiftGreenTicks", 40);
+                    FuryBornNetwork.CHANNEL.sendToServer(new PacketTargetTeleport());
+                }
             }
         }
     }

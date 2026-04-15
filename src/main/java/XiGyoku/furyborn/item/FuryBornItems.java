@@ -74,6 +74,14 @@ public class FuryBornItems {
             Furyborn.ITEMS.register("halo_of_exolumen",
                     () -> new HaloOfExolumenItem(new Item.Properties().stacksTo(1)));
 
+    public static final RegistryObject<Item> SUNRAISER_DRIVE =
+            Furyborn.ITEMS.register("sunraiser_drive",
+                    () -> new SunRaiserDriveItem(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> SYSTEM_XROSSALIVE =
+            Furyborn.ITEMS.register("system_xrossalive",
+                    () -> new SystemXrossAliveItem(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus){
     }
 

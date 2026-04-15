@@ -10,8 +10,10 @@ public class AfterImageData {
     public final float netHeadYaw;
     public final float headPitch;
     public final float bodyYaw;
+    public final boolean swinging;
+    public final int swingTime;
 
-    public AfterImageData(Vec3 position, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float bodyYaw) {
+    public AfterImageData(Vec3 position, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float bodyYaw, boolean swinging, int swingTime) {
         this.position = position;
         this.limbSwing = limbSwing;
         this.limbSwingAmount = limbSwingAmount;
@@ -19,5 +21,7 @@ public class AfterImageData {
         this.netHeadYaw = netHeadYaw;
         this.headPitch = headPitch;
         this.bodyYaw = bodyYaw;
+        this.swinging = swinging;
+        this.swingTime = swingTime;
     }
 }

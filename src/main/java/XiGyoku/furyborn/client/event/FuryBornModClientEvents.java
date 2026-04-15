@@ -1,12 +1,11 @@
 package XiGyoku.furyborn.client.event;
 
-import XiGyoku.furyborn.client.entity.PlayerAfterImageLayer;
 import XiGyoku.furyborn.client.entity.RobyteBitLaserModel;
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
+import XiGyoku.furyborn.client.gui.DriveshiftTintOverlay;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -18,6 +17,7 @@ import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = "furyborn", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class FuryBornModClientEvents {
+
     @SubscribeEvent
     public static void registerOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAboveAll(
@@ -26,16 +26,12 @@ public class FuryBornModClientEvents {
                     RobyteOutOfAreaOverlay.render(guiGraphics, partialTick);
                 }
         );
-    }
-
-    @SubscribeEvent
-    public static void addPlayerLayers(EntityRenderersEvent.AddLayers event) {
-        for (String skinType : event.getSkins()) {
-            PlayerRenderer renderer = event.getSkin(skinType);
-            if (renderer != null) {
-                renderer.addLayer(new PlayerAfterImageLayer(renderer));
-            }
-        }
+        event.registerAboveAll(
+                "driveshift_tint_overlay",
+                (gui, guiGraphics, partialTick, width, height) -> {
+                    DriveshiftTintOverlay.render(guiGraphics, partialTick, width, height);
+                }
+        );
     }
 
     public static final KeyMapping TOGGLE_BUSTER_MODE = new KeyMapping(

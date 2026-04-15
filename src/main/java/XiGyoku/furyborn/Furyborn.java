@@ -65,6 +65,8 @@ public class Furyborn {
         output.accept(FuryBornItems.NULL_DATA_MODEL.get());
         output.accept(FuryBornItems.HALO_OF_EXOLUMEN.get());
         output.accept(FuryBornItems.ROBYTE_SPAWN_EGG.get());
+        output.accept(FuryBornItems.SUNRAISER_DRIVE.get());
+        output.accept(FuryBornItems.SYSTEM_XROSSALIVE.get());
     }).build());
 
     public Furyborn() {
