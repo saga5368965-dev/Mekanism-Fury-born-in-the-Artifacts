@@ -1,10 +1,12 @@
 package XiGyoku.furyborn.client.event;
 
+import XiGyoku.furyborn.client.entity.PlayerAfterImageLayer;
 import XiGyoku.furyborn.client.entity.RobyteBitLaserModel;
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -26,6 +28,16 @@ public class FuryBornModClientEvents {
         );
     }
 
+    @SubscribeEvent
+    public static void addPlayerLayers(EntityRenderersEvent.AddLayers event) {
+        for (String skinType : event.getSkins()) {
+            PlayerRenderer renderer = event.getSkin(skinType);
+            if (renderer != null) {
+                renderer.addLayer(new PlayerAfterImageLayer(renderer));
+            }
+        }
+    }
+
     public static final KeyMapping TOGGLE_BUSTER_MODE = new KeyMapping(
             "key.furyborn.toggle_buster_mode",
             KeyConflictContext.IN_GAME,
@@ -42,6 +54,14 @@ public class FuryBornModClientEvents {
             "key.categories.furyborn"
     );
 
+    public static final KeyMapping TOGGLE_AFTERIMAGE = new KeyMapping(
+            "key.furyborn.toggle_afterimage",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_T,
+            "key.categories.furyborn"
+    );
+
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
@@ -50,7 +70,7 @@ public class FuryBornModClientEvents {
 
     @SubscribeEvent
     public static void onKeyRegister(RegisterKeyMappingsEvent event) {
-
+        event.register(TOGGLE_AFTERIMAGE);
         event.register(TOGGLE_BUSTER_MODE);
         event.register(SHOOT_LASER_BIT);
     }

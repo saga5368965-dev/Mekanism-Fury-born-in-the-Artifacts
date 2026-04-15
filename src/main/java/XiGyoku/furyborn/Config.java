@@ -190,6 +190,9 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue HALO_ROTATION_SPEED_MULTIPLIER = BUILDER
             .defineInRange("haloRotationSpeedMultiplier", 0.5, 0.0, 100.0);
 
+    public static final ForgeConfigSpec.DoubleValue HAZE_SCALE = BUILDER
+            .defineInRange("hazeScale", 0.1, 0.1, 10.0);
+
     public static final ForgeConfigSpec.DoubleValue TOOLTIP_HALO_SCALE = BUILDER
             .defineInRange("tooltipHaloScale", 1.0, 0.1, 10.0);
 

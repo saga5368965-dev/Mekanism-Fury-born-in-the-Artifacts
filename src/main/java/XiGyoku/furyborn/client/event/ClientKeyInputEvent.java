@@ -4,6 +4,7 @@ import XiGyoku.furyborn.item.HaloOfExolumenItem;
 import XiGyoku.furyborn.item.ItemBusterThrower;
 import XiGyoku.furyborn.network.FuryBornNetwork;
 import XiGyoku.furyborn.network.PacketShootLaserBit;
+import XiGyoku.furyborn.network.PacketToggleAfterImage;
 import XiGyoku.furyborn.network.PacketToggleBusterMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +36,16 @@ public class ClientKeyInputEvent {
             if (player != null) {
                 if (CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.getItem() instanceof HaloOfExolumenItem, player).isPresent()) {
                     FuryBornNetwork.CHANNEL.sendToServer(new PacketShootLaserBit());
+                }
+            }
+        }
+        while (FuryBornModClientEvents.TOGGLE_AFTERIMAGE.consumeClick()) {
+            Player player = Minecraft.getInstance().player;
+            if (player != null) {
+                if (CuriosApi.getCuriosHelper().findEquippedCurio(stack -> stack.getItem() instanceof HaloOfExolumenItem, player).isPresent()) {
+                    boolean currentState = player.getPersistentData().getBoolean("ExolumenAfterImage");
+                    player.getPersistentData().putBoolean("ExolumenAfterImage", !currentState);
+                    FuryBornNetwork.CHANNEL.sendToServer(new PacketToggleAfterImage());
                 }
             }
         }

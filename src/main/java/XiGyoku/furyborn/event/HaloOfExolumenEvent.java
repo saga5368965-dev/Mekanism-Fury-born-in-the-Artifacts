@@ -2,7 +2,6 @@ package XiGyoku.furyborn.event;
 
 import XiGyoku.furyborn.item.HaloOfExolumenItem;
 import XiGyoku.furyborn.sound.FuryBornSounds;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
