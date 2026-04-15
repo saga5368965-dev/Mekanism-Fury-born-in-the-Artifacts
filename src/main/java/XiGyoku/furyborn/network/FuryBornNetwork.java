@@ -24,11 +24,17 @@ public class FuryBornNetwork {
                 PacketShootLaserBit::toBytes,
                 PacketShootLaserBit::new,
                 PacketShootLaserBit::handle);
-        CHANNEL.registerMessage(id++,
-                PacketToggleAfterImage.class,
+        CHANNEL.registerMessage(id++, PacketToggleAfterImage.class,
                 PacketToggleAfterImage::toBytes,
                 PacketToggleAfterImage::new,
-                PacketToggleAfterImage::handle
-        );
+                PacketToggleAfterImage::handle);
+        CHANNEL.registerMessage(id++, PacketDirectionalDash.class,
+                PacketDirectionalDash::toBytes,
+                PacketDirectionalDash::new,
+                PacketDirectionalDash::handle);
+        CHANNEL.registerMessage(id++, PacketTargetTeleport.class,
+                PacketTargetTeleport::toBytes,
+                PacketTargetTeleport::new,
+                PacketTargetTeleport::handle);
     }
 }

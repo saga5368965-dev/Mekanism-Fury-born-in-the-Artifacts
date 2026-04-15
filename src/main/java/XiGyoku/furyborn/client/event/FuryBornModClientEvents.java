@@ -62,6 +62,22 @@ public class FuryBornModClientEvents {
             "key.categories.furyborn"
     );
 
+    public static final KeyMapping DRIVESHIFT_DASH = new KeyMapping(
+            "key.furyborn.driveshift_dash",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_Z,
+            "key.categories.furyborn"
+    );
+
+    public static final KeyMapping DRIVESHIFT_BACKSTAB = new KeyMapping(
+            "key.furyborn.driveshift_backstab",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_X,
+            "key.categories.furyborn"
+    );
+
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
@@ -73,5 +89,7 @@ public class FuryBornModClientEvents {
         event.register(TOGGLE_AFTERIMAGE);
         event.register(TOGGLE_BUSTER_MODE);
         event.register(SHOOT_LASER_BIT);
+        event.register(DRIVESHIFT_DASH);
+        event.register(DRIVESHIFT_BACKSTAB);
     }
 }

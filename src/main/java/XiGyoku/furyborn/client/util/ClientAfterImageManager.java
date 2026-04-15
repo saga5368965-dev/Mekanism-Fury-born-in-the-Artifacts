@@ -1,31 +1,53 @@
 package XiGyoku.furyborn.client.util;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = "furyborn", bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientAfterImageManager {
-    public static final Map<UUID, List<Vec3>> PAST_POSITIONS = new HashMap<>();
+    public static final Map<UUID, List<AfterImageData>> PAST_POSITIONS = new HashMap<>();
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.PlayerTickEvent event) {
-        if (event.side.isClient() && event.phase == TickEvent.Phase.END) {
-            Player player = event.player;
-
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            UUID uuid = player.getUUID();
             if (player.getPersistentData().getBoolean("ExolumenAfterImage")) {
-                List<Vec3> positions = PAST_POSITIONS.computeIfAbsent(player.getUUID(), k -> new ArrayList<>());
-                positions.add(0, player.position());
-                if (positions.size() > 20) {
-                    positions.remove(positions.size() - 1);
+                PAST_POSITIONS.putIfAbsent(uuid, new ArrayList<>());
+                List<AfterImageData> list = PAST_POSITIONS.get(uuid);
+
+                float limbSwing = player.walkAnimation.position();
+                float limbSwingAmount = player.walkAnimation.speed();
+                float ageInTicks = player.tickCount;
+                float netHeadYaw = player.getYHeadRot() - player.yBodyRot;
+                float headPitch = player.getXRot();
+                float bodyYaw = player.yBodyRot;
+
+                list.add(0, new AfterImageData(player.position(), limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, bodyYaw));
+
+                if (list.size() > 20) {
+                    list.remove(list.size() - 1);
                 }
             } else {
-                PAST_POSITIONS.remove(player.getUUID());
+                if (PAST_POSITIONS.containsKey(uuid)) {
+                    List<AfterImageData> list = PAST_POSITIONS.get(uuid);
+                    if (!list.isEmpty()) {
+                        list.remove(list.size() - 1);
+                    } else {
+                        PAST_POSITIONS.remove(uuid);
+                    }
+                }
             }
         }
     }
