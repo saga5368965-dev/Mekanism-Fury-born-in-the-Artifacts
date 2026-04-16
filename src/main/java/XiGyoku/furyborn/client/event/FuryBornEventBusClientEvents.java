@@ -289,6 +289,7 @@ public class FuryBornEventBusClientEvents {
             ItemStack stack,
             TooltipMode mode
     ) {
+        ResourceLocation overlayTexture = TOOLTIP_OVERLAY;
         int tooltipWidth = 0;
         int tooltipHeight = components.size() == 1 ? -2 : 0;
         for (ClientTooltipComponent comp : components) {
@@ -298,31 +299,32 @@ public class FuryBornEventBusClientEvents {
         }
         int bgWidth = tooltipWidth + 6;
         int bgHeight = tooltipHeight + 10;
-
         int bgX = x + 10;
         int bgY = y - (bgHeight / 2);
-
         if (bgX + bgWidth > screenWidth) bgX = x - bgWidth - 10;
         if (bgY + bgHeight > screenHeight) bgY = screenHeight - bgHeight;
         if (bgY < 0) bgY = 0;
-
         int centerX = bgX + (bgWidth / 2);
         int centerY = bgY + (bgHeight / 2);
+        int bgColor = 0xF0100010;
+        long time = System.currentTimeMillis();
+        int borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
+        int borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
+        float overlayScale = 0.375F;
+        int overlayActualWidth = (int) (64 * overlayScale);
+        int overlayX = bgX + (bgWidth / 2) - (overlayActualWidth / 2);
+        int splitX = 3;
+        int splitY = 3;
+        int tileWidth = bgWidth / splitX;
+        int tileHeight = bgHeight / splitY;
+        int overlayY = (int) (bgY - (11 * overlayScale)) + 2;
+        int tooltipLeftOffset = 5;
+        int tooltipTopOffset = 3;
 
         PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
         poseStack.translate(0, 0, 400);
-
-        long time = System.currentTimeMillis();
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
-
-        int bgColor = 0xF0100010;
-        int borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
-        int borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
-
-        float overlayScale = 0.375F;
-        int overlayActualWidth = (int) (64 * overlayScale);
-        int overlayX = bgX + (bgWidth / 2) - (overlayActualWidth / 2);
 
         guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + bgHeight, bgColor, bgColor);
         guiGraphics.fillGradient(bgX, bgY, overlayX, bgY + 1, borderColorTop, borderColorTop);
@@ -348,13 +350,14 @@ public class FuryBornEventBusClientEvents {
 
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.2F);
-            guiGraphics.blit(animTexture, bgX, bgY, 0, 0, bgWidth, bgHeight, bgWidth, bgHeight);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-            ResourceLocation overlayTexture = TOOLTIP_OVERLAY;
-            float overlayScale = 0.375F;
-            int overlayX = bgX + (bgWidth / 2) - (int)((64 * overlayScale) / 2);
-            int overlayY = (int) (bgY - (11 * overlayScale)) + 2;
+            for (int row = 0; row < splitY; row++) {
+                for (int col = 0; col < splitX; col++) {
+                    guiGraphics.blit(animTexture, bgX + tileWidth * col, bgY + tileHeight * row, 0, 0, tileWidth, tileHeight, tileWidth, tileHeight);
+                }
+            }
+
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
             poseStack.pushPose();
             poseStack.translate(overlayX, overlayY, 0);
@@ -368,10 +371,8 @@ public class FuryBornEventBusClientEvents {
 
         poseStack.pushPose();
         poseStack.translate(0, 0, 250);
-        int tooltipLeftOffset = 5;
-        int tooltipTopOffset = 3;
-        int offsetY = bgY + tooltipTopOffset;
 
+        int offsetY = bgY + tooltipTopOffset;
         for (ClientTooltipComponent comp : components) {
             if (comp instanceof ClientTextTooltip textTooltip) {
                 textTooltip.renderText(font, bgX + tooltipLeftOffset, offsetY, poseStack.last().pose(), buffer);
