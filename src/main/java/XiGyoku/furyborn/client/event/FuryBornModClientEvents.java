@@ -1,6 +1,7 @@
 package XiGyoku.furyborn.client.event;
 
 import XiGyoku.furyborn.client.entity.RobyteBitLaserModel;
+import XiGyoku.furyborn.client.entity.SunRaiserDriveModel;
 import XiGyoku.furyborn.client.gui.RobyteOutOfAreaOverlay;
 import XiGyoku.furyborn.client.gui.DriveshiftTintOverlay;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
@@ -78,6 +79,7 @@ public class FuryBornModClientEvents {
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(RobyteBitLaserModel.LAYER_LOCATION, RobyteBitLaserModel::createBodyLayer);
         event.registerLayerDefinition(ModelBusterThrower.BUSTER_THROWER_LAYER, ModelBusterThrower::createLayerDefinition);
+        event.registerLayerDefinition(SunRaiserDriveModel.LAYER_LOCATION, SunRaiserDriveModel::createBodyLayer);
     }
 
     @SubscribeEvent

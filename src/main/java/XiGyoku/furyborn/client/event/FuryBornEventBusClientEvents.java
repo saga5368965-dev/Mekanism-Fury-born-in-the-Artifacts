@@ -15,13 +15,17 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -68,6 +72,9 @@ public class FuryBornEventBusClientEvents {
 
     private static final ResourceLocation TOOLTIP_OVERLAY = new ResourceLocation(Furyborn.MODID, "textures/gui/tooltip/tooltip_overlay.png");
     private static final ResourceLocation[] ANIM_FRAMES = new ResourceLocation[ANIMATION_FRAMES];
+
+    private static ItemStack lastCapturedItem = ItemStack.EMPTY;
+    private static TextColor lastCapturedTooltipColor = null;
 
     static {
         for (int i = 0; i < ANIMATION_FRAMES; i++) {
@@ -142,11 +149,101 @@ public class FuryBornEventBusClientEvents {
         }
     }
 
-    private static Vector4f getPlanetColor(int index) {
+    private static Vector4f getPlanetColor(int index, boolean hasCustomRarity, int customColorHex) {
+        if (hasCustomRarity) {
+            float r = ((customColorHex >> 16) & 0xFF) / 255.0f;
+            float g = ((customColorHex >> 8) & 0xFF) / 255.0f;
+            float b = (customColorHex & 0xFF) / 255.0f;
+            return new Vector4f(r, g, b, 1.0f);
+        }
         if (Config.TOOLTIP_HALO_UNIFY_PLANET_COLOR.get()) {
             return getUnifiedColor();
         }
         return COLORS_PLANETS[index % COLORS_PLANETS.length];
+    }
+
+    private static TextColor extractDynamicColor(Component component) {
+        if (component == null) return null;
+
+        if (component.getStyle() != null && component.getStyle().getColor() != null) {
+            TextColor color = component.getStyle().getColor();
+            if (!color.getClass().equals(TextColor.class)) {
+                return color;
+            }
+        }
+
+        if (component.getContents() instanceof TranslatableContents translatable) {
+            for (Object arg : translatable.getArgs()) {
+                if (arg instanceof Component argComp) {
+                    TextColor color = extractDynamicColor(argComp);
+                    if (color != null) return color;
+                }
+            }
+        }
+
+        for (Component sibling : component.getSiblings()) {
+            TextColor color = extractDynamicColor(sibling);
+            if (color != null) return color;
+        }
+        return null;
+    }
+
+    private static TextColor extractFirstColor(Component component) {
+        if (component == null) return null;
+
+        if (component.getStyle() != null && component.getStyle().getColor() != null) {
+            return component.getStyle().getColor();
+        }
+
+        if (component.getContents() instanceof TranslatableContents translatable) {
+            for (Object arg : translatable.getArgs()) {
+                if (arg instanceof Component argComp) {
+                    TextColor color = extractFirstColor(argComp);
+                    if (color != null) return color;
+                }
+            }
+        }
+
+        for (Component sibling : component.getSiblings()) {
+            TextColor color = extractFirstColor(sibling);
+            if (color != null) return color;
+        }
+        return null;
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onCaptureTooltipColor(ItemTooltipEvent event) {
+        List<Component> tooltip = event.getToolTip();
+        lastCapturedItem = event.getItemStack();
+
+        if (!tooltip.isEmpty()) {
+            Component firstLine = tooltip.get(0);
+            TextColor dynamic = extractDynamicColor(firstLine);
+            if (dynamic != null) {
+                lastCapturedTooltipColor = dynamic;
+            } else {
+                lastCapturedTooltipColor = extractFirstColor(firstLine);
+            }
+        } else {
+            lastCapturedTooltipColor = null;
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onItemTooltip(ItemTooltipEvent event) {
+        ItemStack stack = event.getItemStack();
+        if (stack.isEmpty()) return;
+
+        net.minecraft.world.item.Rarity rarity = stack.getRarity();
+
+        if (XiGyoku.furyborn.item.FuryBornRarities.hasCustomColor(rarity)) {
+            List<Component> tooltip = event.getToolTip();
+            if (!tooltip.isEmpty()) {
+                int hexColor = XiGyoku.furyborn.item.FuryBornRarities.getColor(rarity);
+                Component originalName = tooltip.get(0);
+                tooltip.set(0, originalName.copy().withStyle(Style.EMPTY.withColor(TextColor.fromRgb(hexColor))));
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -170,7 +267,7 @@ public class FuryBornEventBusClientEvents {
         );
     }
 
-    public static void renderHaloBackground(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, long timeMs) {
+    public static void renderHaloBackground(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, long timeMs, boolean hasCustomRarity, int rarityColorHex) {
         float ticks = (timeMs % 1000000L) / 50.0F;
         int packedLight = 15728880;
         float haloGuiScale = 120.0F * Config.TOOLTIP_HALO_SCALE.get().floatValue();
@@ -222,7 +319,7 @@ public class FuryBornEventBusClientEvents {
 
             float speed = getOrbitSpeed(i);
             float basePlanetSize = getPlanetRadius(i);
-            Vector4f basePlanetColor = getPlanetColor(i);
+            Vector4f basePlanetColor = getPlanetColor(i, hasCustomRarity, rarityColorHex);
 
             int trailSteps = 20;
             float trailLengthTicks = 15.0F;
@@ -297,7 +394,7 @@ public class FuryBornEventBusClientEvents {
             if (width > tooltipWidth) tooltipWidth = width;
             tooltipHeight += comp.getHeight();
         }
-        int bgWidth = tooltipWidth + 6;
+        int bgWidth = tooltipWidth + 10;
         int bgHeight = tooltipHeight + 10;
         int bgX = x + 10;
         int bgY = y - (bgHeight / 2);
@@ -308,8 +405,57 @@ public class FuryBornEventBusClientEvents {
         int centerY = bgY + (bgHeight / 2);
         int bgColor = 0xF0100010;
         long time = System.currentTimeMillis();
-        int borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
-        int borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
+
+        int borderColorTop;
+        int borderColorBottom;
+        int energeticLineColor;
+        boolean hasCustomRarity = false;
+        int rarityColorHex = 0xFFFFFF;
+
+        if (mode == TooltipMode.FURYBORN) {
+            borderColorTop = ColorUtil.getPulsingColor(time, 0x8000FF00, 0xA055FF55);
+            borderColorBottom = ColorUtil.getPulsingColor(time, 0x8000A000, 0xA033CC33);
+            energeticLineColor = 0x55FF55;
+        } else {
+            hasCustomRarity = Config.TOOLTIP_FOLLOW_RARITY_COLOR.get();
+
+            if (hasCustomRarity) {
+                if (ItemStack.isSameItemSameTags(stack, lastCapturedItem) && lastCapturedTooltipColor != null) {
+                    rarityColorHex = lastCapturedTooltipColor.getValue();
+                } else if (XiGyoku.furyborn.item.FuryBornRarities.hasCustomColor(stack.getRarity())) {
+                    rarityColorHex = XiGyoku.furyborn.item.FuryBornRarities.getColor(stack.getRarity());
+                } else if (stack.getRarity().color != null && stack.getRarity().color.getColor() != null) {
+                    rarityColorHex = stack.getRarity().color.getColor();
+                } else {
+                    hasCustomRarity = false;
+                }
+            }
+
+            if (!hasCustomRarity && XiGyoku.furyborn.item.FuryBornRarities.hasCustomColor(stack.getRarity())) {
+                rarityColorHex = XiGyoku.furyborn.item.FuryBornRarities.getColor(stack.getRarity());
+                hasCustomRarity = true;
+            }
+
+            int r = (rarityColorHex >> 16) & 0xFF;
+            int g = (rarityColorHex >> 8) & 0xFF;
+            int b = rarityColorHex & 0xFF;
+
+            int brightR = Math.min(255, r + 60);
+            int brightG = Math.min(255, g + 60);
+            int brightB = Math.min(255, b + 60);
+
+            energeticLineColor = (brightR << 16) | (brightG << 8) | brightB;
+
+            int colorTopBright = (0xA0 << 24) | (r << 16) | (g << 8) | b;
+            int colorTopDark = (0x80 << 24) | ((r / 2) << 16) | ((g / 2) << 8) | (b / 2);
+
+            int colorBottomBright = (0xA0 << 24) | ((r * 4 / 5) << 16) | ((g * 4 / 5) << 8) | (b * 4 / 5);
+            int colorBottomDark = (0x80 << 24) | ((r * 2 / 5) << 16) | ((g * 2 / 5) << 8) | (b * 2 / 5);
+
+            borderColorTop = ColorUtil.getPulsingColor(time, colorTopDark, colorTopBright);
+            borderColorBottom = ColorUtil.getPulsingColor(time, colorBottomDark, colorBottomBright);
+        }
+
         float overlayScale = 0.375F;
         int overlayActualWidth = (int) (64 * overlayScale);
         int overlayX = bgX + (bgWidth / 2) - (overlayActualWidth / 2);
@@ -327,17 +473,23 @@ public class FuryBornEventBusClientEvents {
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
 
         guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + bgHeight, bgColor, bgColor);
-        guiGraphics.fillGradient(bgX, bgY, overlayX, bgY + 1, borderColorTop, borderColorTop);
-        guiGraphics.fillGradient(overlayX + overlayActualWidth, bgY, bgX + bgWidth, bgY + 1, borderColorTop, borderColorTop);
+
+        if (mode == TooltipMode.FURYBORN) {
+            guiGraphics.fillGradient(bgX, bgY, overlayX, bgY + 1, borderColorTop, borderColorTop);
+            guiGraphics.fillGradient(overlayX + overlayActualWidth, bgY, bgX + bgWidth, bgY + 1, borderColorTop, borderColorTop);
+        } else {
+            guiGraphics.fillGradient(bgX, bgY, bgX + bgWidth, bgY + 1, borderColorTop, borderColorTop);
+        }
+
         guiGraphics.fillGradient(bgX, bgY + bgHeight - 1, bgX + bgWidth, bgY + bgHeight, borderColorBottom, borderColorBottom);
         guiGraphics.fillGradient(bgX, bgY, bgX + 1, bgY + bgHeight, borderColorTop, borderColorBottom);
         guiGraphics.fillGradient(bgX + bgWidth - 1, bgY, bgX + bgWidth, bgY + bgHeight, borderColorTop, borderColorBottom);
 
-        ColorUtil.drawEnergeticLine(guiGraphics, bgX, bgY, bgWidth, bgHeight, time);
+        ColorUtil.drawEnergeticLine(guiGraphics, bgX, bgY, bgWidth-1, bgHeight-1, time, energeticLineColor);
 
         poseStack.pushPose();
         poseStack.translate(centerX, centerY, 0);
-        renderHaloBackground(poseStack, buffer, time);
+        renderHaloBackground(poseStack, buffer, time, hasCustomRarity, rarityColorHex);
         buffer.endBatch(RenderType.lightning());
         poseStack.popPose();
 

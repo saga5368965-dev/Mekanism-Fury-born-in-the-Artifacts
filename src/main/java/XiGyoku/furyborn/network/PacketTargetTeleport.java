@@ -47,7 +47,7 @@ public class PacketTargetTeleport {
                     Vec3 back = closest.position().subtract(fwdX * 1.5D, 0, fwdZ * 1.5D);
 
                     player.connection.teleport(back.x, closest.getY() + 0.2D, back.z, closest.getYRot(), closest.getXRot());
-                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 0.1F, 1.0F);
                 }
             }
         });

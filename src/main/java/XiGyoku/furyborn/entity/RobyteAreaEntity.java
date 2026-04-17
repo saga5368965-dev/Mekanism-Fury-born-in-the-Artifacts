@@ -81,8 +81,8 @@ public class RobyteAreaEntity extends Entity {
                     if (this.tickCount > 20) {
                         clearMonitoredFromAll(serverLevel);
                         this.discard();
-                        return;
                     }
+                    return;
                 } else if (boss.isRemoved() || !boss.isAlive()) {
                     clearMonitoredFromAll(serverLevel);
                     this.discard();
@@ -91,8 +91,8 @@ public class RobyteAreaEntity extends Entity {
             } else {
                 if (this.tickCount > 10) {
                     this.discard();
-                    return;
                 }
+                return;
             }
 
             for (Player player : serverLevel.players()) {
@@ -120,14 +120,17 @@ public class RobyteAreaEntity extends Entity {
                             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 2));
                             player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 2));
                             if (player.tickCount % 20 == 0) {
-                                if (!this.getRobyte().isRebellion()) {
-                                    player.hurt(serverLevel.damageSources().magic(), Config.ROBYTE_AREA_DAMAGE.get().floatValue());
-                                } else {
-                                    if (Config.ROBYTE_REBELLION_DO_DEATH_ATTACK.get()) {
-                                        player.hurt(serverLevel.damageSources().magic(), Float.MAX_VALUE);
-                                        player.setHealth(0.0F);
+                                RobyteEntity robyte = this.getRobyte();
+                                if (robyte != null) {
+                                    if (!robyte.isRebellion()) {
+                                        player.hurt(serverLevel.damageSources().magic(), Config.ROBYTE_AREA_DAMAGE.get().floatValue());
                                     } else {
-                                        player.hurt(serverLevel.damageSources().magic(), Config.ROBYTE_REBELLION_AREA_DAMAGE.get().floatValue());
+                                        if (Config.ROBYTE_REBELLION_DO_DEATH_ATTACK.get()) {
+                                            player.hurt(serverLevel.damageSources().magic(), Float.MAX_VALUE);
+                                            player.setHealth(0.0F);
+                                        } else {
+                                            player.hurt(serverLevel.damageSources().magic(), Config.ROBYTE_REBELLION_AREA_DAMAGE.get().floatValue());
+                                        }
                                     }
                                 }
                             }

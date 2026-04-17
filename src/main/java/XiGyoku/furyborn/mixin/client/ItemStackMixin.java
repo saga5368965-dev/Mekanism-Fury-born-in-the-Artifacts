@@ -21,7 +21,7 @@ public abstract class ItemStackMixin {
         }
         if (stack.getItem() == FuryBornItems.BUSTER_THROWER.get()) {
             String originalName = cir.getReturnValue().getString();
-            cir.setReturnValue(Component.literal(originalName + ":_FB_"));
+            cir.setReturnValue(Component.literal(originalName + ":_FB_" + ":_FBS_"));
         }
     }
 }

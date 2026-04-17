@@ -69,7 +69,7 @@ public class PacketDirectionalDash {
                 Vec3 target = player.position().add(move);
 
                 player.connection.teleport(target.x, target.y + 0.2D, target.z, player.getYRot(), player.getXRot());
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 0.1F, 1.0F);
             }
         });
         context.setPacketHandled(true);

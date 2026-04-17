@@ -68,7 +68,7 @@ public class FuryBornItems {
 
     public static final RegistryObject<Item> BUSTER_THROWER =
             Furyborn.ITEMS.register("buster_thrower",
-                    () -> new ItemBusterThrower(new Item.Properties().stacksTo(1)));
+                    () -> new ItemBusterThrower(new Item.Properties().rarity(FuryBornRarities.STARRY).stacksTo(1)));
 
     public static final RegistryObject<Item> HALO_OF_EXOLUMEN =
             Furyborn.ITEMS.register("halo_of_exolumen",
@@ -76,11 +76,23 @@ public class FuryBornItems {
 
     public static final RegistryObject<Item> SUNRAISER_DRIVE =
             Furyborn.ITEMS.register("sunraiser_drive",
-                    () -> new SunRaiserDriveItem(new Item.Properties().stacksTo(1)));
+                    () -> new SunRaiserDriveItem(new Item.Properties().rarity(FuryBornRarities.STARRY).stacksTo(1)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.sunraiser_drive_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
 
     public static final RegistryObject<Item> SYSTEM_XROSSALIVE =
             Furyborn.ITEMS.register("system_xrossalive",
-                    () -> new SystemXrossAliveItem(new Item.Properties().stacksTo(1)));
+                    () -> new SystemXrossAliveItem(new Item.Properties().rarity(FuryBornRarities.STARRY).stacksTo(1)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.system_xrossalive_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
 
     public static void register(IEventBus eventBus){
     }

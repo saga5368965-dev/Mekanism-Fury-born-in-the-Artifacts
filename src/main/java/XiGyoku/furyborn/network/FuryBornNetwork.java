@@ -36,5 +36,13 @@ public class FuryBornNetwork {
                 PacketTargetTeleport::toBytes,
                 PacketTargetTeleport::new,
                 PacketTargetTeleport::handle);
+        CHANNEL.registerMessage(id++, PacketToggleAfterImage.class,
+                PacketToggleAfterImage::toBytes,
+                PacketToggleAfterImage::new,
+                PacketToggleAfterImage::handle);
+        CHANNEL.registerMessage(id++, PacketSyncAfterImage.class,
+                PacketSyncAfterImage::toBytes,
+                PacketSyncAfterImage::new,
+                PacketSyncAfterImage::handle);
     }
 }

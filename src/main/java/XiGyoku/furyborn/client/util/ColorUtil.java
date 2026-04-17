@@ -28,7 +28,7 @@ public class ColorUtil {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-    public static void drawEnergeticLine(GuiGraphics guiGraphics, int bgX, int bgY, int bgWidth, int bgHeight, long time) {
+    public static void drawEnergeticLine(GuiGraphics guiGraphics, int bgX, int bgY, int bgWidth, int bgHeight, long time, int lineColor) {
         int perimeter = bgWidth * 2 + bgHeight * 2;
         float speed = 0.15f;
         float currentPos = ((time % 100000L) * speed) % perimeter;
@@ -45,7 +45,7 @@ public class ColorUtil {
             int alpha = (int) (255 * ratio * ratio);
             if (alpha <= 0) continue;
 
-            int color = (alpha << 24) | 0xFFFFFF;
+            int color = (alpha << 24) | (lineColor & 0xFFFFFF);
             drawGlowPoint(guiGraphics, bgX, bgY, bgWidth, bgHeight, tailPos, color, 0);
         }
 

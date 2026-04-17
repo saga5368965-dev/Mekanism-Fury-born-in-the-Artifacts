@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.function.Supplier;
 
@@ -25,9 +26,10 @@ public class PacketToggleAfterImage {
                 boolean currentState = player.getPersistentData().getBoolean("ExolumenAfterImage");
                 boolean newState = !currentState;
                 player.getPersistentData().putBoolean("ExolumenAfterImage", newState);
+
                 Level level = player.level();
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 1.0F, 1.0F
-                );
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 0.1F, 1.0F);
+                FuryBornNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new PacketSyncAfterImage(newState));
             }
         });
         context.setPacketHandled(true);

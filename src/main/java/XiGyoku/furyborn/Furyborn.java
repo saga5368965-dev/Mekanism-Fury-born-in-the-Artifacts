@@ -1,14 +1,11 @@
 package XiGyoku.furyborn;
 
 import XiGyoku.furyborn.block.FuryBornBlocks;
-import XiGyoku.furyborn.client.entity.RobyteBitLaserRenderer;
-import XiGyoku.furyborn.client.entity.RobyteLaserRenderer;
+import XiGyoku.furyborn.client.entity.*;
 import XiGyoku.furyborn.client.item.HaloOfExolumenRenderer;
 import XiGyoku.furyborn.client.item.ModelBusterThrower;
 import XiGyoku.furyborn.effect.FuryBornEffects;
 import XiGyoku.furyborn.entity.FuryBornEntityTypes;
-import XiGyoku.furyborn.client.entity.RobyteAreaRenderer;
-import XiGyoku.furyborn.client.entity.RobyteRenderer;
 import XiGyoku.furyborn.item.FuryBornItems;
 import XiGyoku.furyborn.network.FuryBornNetwork;
 import XiGyoku.furyborn.sound.FuryBornSounds;
@@ -129,6 +126,7 @@ public class Furyborn {
 
             event.enqueueWork(() -> {
                 CuriosRendererRegistry.register(FuryBornItems.HALO_OF_EXOLUMEN.get(), HaloOfExolumenRenderer::new);
+                CuriosRendererRegistry.register(FuryBornItems.SUNRAISER_DRIVE.get(), SunRaiserDriveRenderer::new);
             });
         }
     }

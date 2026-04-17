@@ -2,6 +2,8 @@ package XiGyoku.furyborn.event;
 
 import XiGyoku.furyborn.item.SunRaiserDriveItem;
 import XiGyoku.furyborn.item.SystemXrossAliveItem;
+import XiGyoku.furyborn.network.FuryBornNetwork;
+import XiGyoku.furyborn.network.PacketSyncAfterImage;
 import XiGyoku.furyborn.sound.FuryBornSounds;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -30,7 +32,6 @@ public class PlayerDriveshiftEvent {
     private static final UUID DRIVESHIFT_SPEED_ID = UUID.fromString("1f2d3e4c-5b6a-7f8e-9d0c-1b2a3f4e5d6c");
     private static final UUID DRIVESHIFT_DAMAGE_ID = UUID.fromString("2f3d4e5c-6b7a-8f9e-0d1c-2b3a4f5e6d7c");
     private static final UUID DRIVESHIFT_ARMOR_ID = UUID.fromString("3f4d5e6c-7b8a-9f0e-1d2c-3b4a5f6e7d8c");
-    private static final String DRIVESHIFT_FADE_PROGRESS = "DriveshiftFadeProgress";
 
     public static int getDriveCount(Player player) {
         AtomicInteger count = new AtomicInteger(0);
@@ -58,7 +59,24 @@ public class PlayerDriveshiftEvent {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Player player = event.player;
+
         boolean isActive = player.getPersistentData().getBoolean("ExolumenAfterImage");
+        float progress = player.getPersistentData().getFloat("DriveshiftFadeProgress");
+
+        if (isActive) {
+            progress = Math.min(1.0f, progress + 0.1f);
+        } else {
+            progress = Math.max(0.0f, progress - 0.05f);
+        }
+        player.getPersistentData().putFloat("DriveshiftFadeProgress", progress);
+
+        if (player.getPersistentData().contains("DriveshiftGreenTicks")) {
+            int greenTicks = player.getPersistentData().getInt("DriveshiftGreenTicks");
+            if (greenTicks > 0) player.getPersistentData().putInt("DriveshiftGreenTicks", greenTicks - 1);
+        }
+
+        if (player.level().isClientSide) return;
+        if (player.tickCount < 20) return;
 
         int driveCount = getDriveCount(player);
         int xrossCount = getXrossCount(player);
@@ -66,19 +84,9 @@ public class PlayerDriveshiftEvent {
         if (isActive && driveCount == 0) {
             player.getPersistentData().putBoolean("ExolumenAfterImage", false);
             isActive = false;
-        }
-
-        float progress = player.getPersistentData().contains(DRIVESHIFT_FADE_PROGRESS) ? player.getPersistentData().getFloat(DRIVESHIFT_FADE_PROGRESS) : 0.0f;
-        if (isActive) {
-            progress = Math.min(1.0f, progress + 0.1f);
-        } else {
-            progress = Math.max(0.0f, progress - 0.05f);
-        }
-        player.getPersistentData().putFloat(DRIVESHIFT_FADE_PROGRESS, progress);
-
-        if (player.getPersistentData().contains("DriveshiftGreenTicks")) {
-            int greenTicks = player.getPersistentData().getInt("DriveshiftGreenTicks");
-            if (greenTicks > 0) player.getPersistentData().putInt("DriveshiftGreenTicks", greenTicks - 1);
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                FuryBornNetwork.CHANNEL.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketSyncAfterImage(false));
+            }
         }
 
         double speedMod = (driveCount >= 2) ? 4.0 : 2.0;
@@ -144,7 +152,7 @@ public class PlayerDriveshiftEvent {
         if (event.getEntity() instanceof Player player && player.getPersistentData().getBoolean("ExolumenAfterImage")) {
             if (player.level().random.nextFloat() < 0.9F) {
                 event.setCanceled(true);
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), FuryBornSounds.ROBYTE_TELEPORT.get(), SoundSource.PLAYERS, 0.1F, 0.5F);
             }
         }
     }

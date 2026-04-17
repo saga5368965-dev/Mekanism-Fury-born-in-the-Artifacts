@@ -22,6 +22,8 @@ import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -79,7 +81,7 @@ public class ItemBusterThrower extends Item implements IItemHUDProvider {
 
     @Override
     public @NotNull Component getName(@NotNull ItemStack stack) {
-        return super.getName(stack).copy().withStyle(net.minecraft.ChatFormatting.AQUA);
+        return super.getName(stack).copy().withStyle(Style.EMPTY.withColor(TextColor.parseColor("#5AFF19")));
     }
 
     @Override
