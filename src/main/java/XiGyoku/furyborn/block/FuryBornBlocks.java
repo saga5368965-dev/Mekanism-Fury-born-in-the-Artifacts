@@ -1,6 +1,7 @@
 package XiGyoku.furyborn.block;
 
 import XiGyoku.furyborn.Furyborn;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -14,11 +15,13 @@ public class FuryBornBlocks {
     public static final RegistryObject<Block> T_SUPER_BLOCK = registerBlock("t_supercomputer",
             () -> new SuperComputerBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops()
                     .noOcclusion()));
 
     public static final RegistryObject<Block> HALO_PROJECTOR = registerBlock("halo_projector",
             () -> new HaloProjectorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .sound(SoundType.METAL)
+                    .requiresCorrectToolForDrops()
                     .noOcclusion()));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
