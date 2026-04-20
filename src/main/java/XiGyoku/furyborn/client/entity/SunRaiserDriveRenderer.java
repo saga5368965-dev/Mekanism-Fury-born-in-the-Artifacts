@@ -66,7 +66,7 @@ public class SunRaiserDriveRenderer implements ICurioRenderer {
                     break;
                 }
             }
-
+            matrixStack.mulPose(Axis.YP.rotationDegrees(90.0F));
             if (renderIndex % 2 == 0) {
                 matrixStack.translate(-0.550, -0.125, -0.075);
                 matrixStack.mulPose(Axis.YP.rotationDegrees(0.0F));
@@ -76,6 +76,7 @@ public class SunRaiserDriveRenderer implements ICurioRenderer {
                 matrixStack.scale(-1.0F, 1.0F, 1.0F);
                 matrixStack.translate(-0.550, -0.125, -0.075);
                 matrixStack.mulPose(Axis.YP.rotationDegrees(0.0F));
+
 
                 bodyPose.translate(0.550F, -0.125F, -0.075F);
             }
