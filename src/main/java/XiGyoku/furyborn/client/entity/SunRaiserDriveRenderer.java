@@ -74,14 +74,14 @@ public class SunRaiserDriveRenderer implements ICurioRenderer {
                 matrixStack.translate(-0.400, -0.125, -0.075);
                 matrixStack.mulPose(Axis.YP.rotationDegrees(90.0F));
 
-                bodyPose.translate(-0.375F, -0.125F, 0.425F);
+                bodyPose.translate(0.375F, -0.125F, 0.425F);
                 bodyPose.rotateLocalY((float) Math.toRadians(270.0));
             } else {
                 matrixStack.scale(-1.0F, 1.0F, 1.0F);
                 matrixStack.translate(-0.400, -0.125, -0.075);
                 matrixStack.mulPose(Axis.YP.rotationDegrees(90.0F));
 
-                bodyPose.translate(0.325F, -0.125F, 0.425F);
+                bodyPose.translate(-0.375F, -0.125F, 0.425F);
                 bodyPose.rotateLocalY((float) Math.toRadians(270.0));
             }
         } else {
