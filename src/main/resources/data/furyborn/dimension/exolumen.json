@@ -1,0 +1,12 @@
+{
+  "type": "furyborn:exolumen",
+  "generator": {
+    "type": "minecraft:noise",
+    "seed": 0,
+    "settings": "furyborn:exolumen_noise",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "furyborn:field_of_desire"
+    }
+  }
+}

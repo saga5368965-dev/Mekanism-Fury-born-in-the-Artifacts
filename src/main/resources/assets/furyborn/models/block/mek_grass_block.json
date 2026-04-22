@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "furyborn:block/grass_top_mek",
+    "bottom": "furyborn:block/dirt_mek",
+    "side": "furyborn:block/grass_side_mek"
+  }
+}
