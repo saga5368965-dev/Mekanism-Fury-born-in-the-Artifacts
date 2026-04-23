@@ -1,20 +1,20 @@
 {
   "display": {
     "icon": {
-      "item": "furyborn:null_datamodel"
+      "item": "furyborn:robyte_chip"
     },
     "title": {
-      "text": "Aftermath"
+      "text": "これを、ロビットの記録回路に取付けろ"
     },
     "description": {
-      "text": "虚空のデータモデルを手に入れる。一切正体不明だ。"
+      "text": "メカチップを手にいれる。"
     },
     "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "furyborn:robyte_chip_awaken",
+  "parent": "furyborn:kill_boss",
   "criteria": {
     "has_datamodel": {
       "trigger": "minecraft:inventory_changed",
@@ -22,7 +22,7 @@
         "items": [
           {
             "items": [
-              "furyborn:null_datamodel"
+              "furyborn:robyte_chip"
             ]
           }
         ]

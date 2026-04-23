@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "furyborn:robyte_chip_awaken"
+    },
+    {
+      "item": "mekanism:ultimate_control_circuit"
+    }
+  ],
+  "result": {
+    "item": "furyborn:null_datamodel"
+  }
+}

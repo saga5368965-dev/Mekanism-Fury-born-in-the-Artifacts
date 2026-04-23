@@ -71,6 +71,26 @@ public class FuryBornItems {
                         }
                     });
 
+    public static final RegistryObject<Item> ROBYTE_CHIP =
+            Furyborn.ITEMS.register("robyte_chip",
+                    () -> new Item(new Item.Properties()) {
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.robyte_chip_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> ROBYTE_CHIP_AWAKEN =
+            Furyborn.ITEMS.register("robyte_chip_awaken",
+                    () -> new Item(new Item.Properties().rarity(FuryBornRarities.STARRY)) {
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("item.furyborn.robyte_chip_awaken_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
     public static final RegistryObject<Item> ROBYTE_SPAWN_EGG =
             Furyborn.ITEMS.register("robyte_spawn_egg",
                     () -> new ForgeSpawnEggItem(FuryBornEntityTypes.ROBYTE, 0xf8f8ff, 0xff0000,
@@ -101,6 +121,66 @@ public class FuryBornItems {
                         public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
                             super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
                             pTooltipComponents.add(Component.translatable("item.furyborn.system_xrossalive_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> EXOLUMEN_PORTAL_ITEM =
+            Furyborn.ITEMS.register("exolumen_portal",
+                    () -> new BlockItem(FuryBornBlocks.EXOLUMEN_PORTAL.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.exolumen_portal_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> MEK_DIRT =
+            Furyborn.ITEMS.register("mek_dirt",
+                    () -> new BlockItem(FuryBornBlocks.MEK_DIRT.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.mek_dirt_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> MEK_COBBLESTONE =
+            Furyborn.ITEMS.register("mek_cobblestone",
+                    () -> new BlockItem(FuryBornBlocks.MEK_COBBLESTONE.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.mek_cobblestone_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> MEK_TALL_GRASS =
+            Furyborn.ITEMS.register("mek_tall_grass",
+                    () -> new BlockItem(FuryBornBlocks.MEK_TALL_GRASS.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.mek_tall_grass_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> MEK_GRASS_BLOCK =
+            Furyborn.ITEMS.register("mek_grass_block",
+                    () -> new BlockItem(FuryBornBlocks.MEK_GRASS_BLOCK.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.mek_grass_block_desc").withStyle(ChatFormatting.GRAY));
+                        }
+                    });
+
+    public static final RegistryObject<Item> PORTAL_FRAME_MEK =
+            Furyborn.ITEMS.register("portal_frame_mek",
+                    () -> new BlockItem(FuryBornBlocks.PORTAL_FRAME_MEK.get(), new Item.Properties().rarity(FuryBornRarities.STARRY)){
+                        @Override
+                        public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                            super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                            pTooltipComponents.add(Component.translatable("block.furyborn.portal_frame_mek_desc").withStyle(ChatFormatting.GRAY));
                         }
                     });
 

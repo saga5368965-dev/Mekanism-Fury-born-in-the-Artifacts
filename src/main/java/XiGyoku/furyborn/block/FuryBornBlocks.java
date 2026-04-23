@@ -41,6 +41,12 @@ public class FuryBornBlocks {
                     .instabreak()
                     .sound(SoundType.GRASS)));
 
+    public static final RegistryObject<Block> EXOLUMEN_PORTAL = registerBlock("exolumen_portal",
+            () -> new ExolumenPortalBlock());
+
+    public static final RegistryObject<Block> PORTAL_FRAME_MEK = registerBlock("portal_frame_mek",
+            () -> new PortalFrameBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).sound(SoundType.METAL).requiresCorrectToolForDrops().noOcclusion()));
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block){
         return Furyborn.BLOCKS.register(name, block);
     }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "weapons",
+  "pattern": [
+    " R ",
+    "RTR",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "furyborn:robyte_chip_awaken"
+    },
+    "T": {
+      "item": "mekanism:sps_port"
+    }
+  },
+  "result": {
+    "item": "furyborn:portal_frame_mek"
+  }
+}

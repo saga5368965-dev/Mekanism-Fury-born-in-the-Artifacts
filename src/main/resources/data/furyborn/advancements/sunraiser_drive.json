@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "furyborn:kill_boss",
+  "parent": "furyborn:robyte_chip_awaken",
   "criteria": {
     "has_datamodel": {
       "trigger": "minecraft:inventory_changed",

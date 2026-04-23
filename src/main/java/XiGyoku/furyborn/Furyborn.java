@@ -66,6 +66,14 @@ public class Furyborn {
         output.accept(FuryBornItems.SUNRAISER_DRIVE.get());
         output.accept(FuryBornItems.SYSTEM_XROSSALIVE.get());
         output.accept(FuryBornItems.HALO_PROJECTOR_ITEM.get());
+        output.accept(FuryBornItems.MEK_DIRT.get());
+        output.accept(FuryBornItems.MEK_GRASS_BLOCK.get());
+        output.accept(FuryBornItems.MEK_COBBLESTONE.get());
+        output.accept(FuryBornItems.MEK_TALL_GRASS.get());
+        output.accept(FuryBornItems.EXOLUMEN_PORTAL_ITEM.get());
+        output.accept(FuryBornItems.PORTAL_FRAME_MEK.get());
+        output.accept(FuryBornItems.ROBYTE_CHIP.get());
+        output.accept(FuryBornItems.ROBYTE_CHIP_AWAKEN.get());
     }).build());
 
     public Furyborn() {

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "weapons",
+  "pattern": [
+    "LAL",
+    "RTR",
+    "LAL"
+  ],
+  "key": {
+    "R": {
+      "item": "furyborn:robyte_chip_awaken"
+    },
+    "T": {
+      "item": "mekanism:flamethrower"
+    },
+    "L": {
+      "item": "mekanism:laser"
+    },
+    "A": {
+      "item": "mekanism:laser_amplifier"
+    }
+  },
+  "result": {
+    "item": "furyborn:buster_thrower"
+  }
+}

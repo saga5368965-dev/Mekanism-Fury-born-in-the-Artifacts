@@ -1,0 +1,15 @@
+{
+  "type": "mekanism:metallurgic_infusing",
+  "chemicalInput": {
+    "amount": 10,
+    "infuse_type": "mekanism:redstone"
+  },
+  "itemInput": {
+    "ingredient": {
+      "item": "furyborn:robyte_chip"
+    }
+  },
+  "output": {
+    "item": "furyborn:robyte_chip_awaken"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "particle": "furyborn:block/portal_mek",
+    "portal": "furyborn:block/portal_mek"
+  },
+  "elements": [
+    {
+      "from": [0, 6, 0],
+      "to": [16, 10, 16],
+      "faces": {
+        "up": {"uv": [0, 0, 16, 16], "texture": "#portal"},
+        "down": {"uv": [0, 0, 16, 16], "texture": "#portal"}
+      }
+    }
+  ]
+}

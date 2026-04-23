@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SAS",
+    "RLR",
+    "SRS"
+  ],
+  "key": {
+    "R": {
+      "item": "furyborn:robyte_chip_awaken"
+    },
+    "L": {
+      "item": "mekanism:laser"
+    },
+    "A": {
+      "item": "mekanism:laser_amplifier"
+    },
+    "S": {
+      "item": "mekanism:steel_casing"
+    }
+  },
+  "result": {
+    "item": "furyborn:halo_projector"
+  }
+}
